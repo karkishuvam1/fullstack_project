@@ -1,0 +1,417 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,500&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* ---------- Design tokens ---------- */
+.aur-root {
+  --bg: #0b0d0f;
+  --panel: #121519;
+  --surface: #191d22;
+  --surface-focus: #1e2329;
+  --border: #262b31;
+  --text: #ece8e1;
+  --text-muted: #8b9096;
+  --text-faint: #565c62;
+  --brass: #b8935f;
+  --brass-bright: #d4af7a;
+  --green: #5c7a5e;
+  --danger: #c06a52;
+
+  min-height: 100vh;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Manrope', system-ui, sans-serif;
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+}
+
+.aur-root * {
+  box-sizing: border-box;
+}
+
+/* ---------- Left: blueprint showroom panel ---------- */
+.aur-showroom {
+  position: relative;
+  flex: 0 0 44%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(92, 122, 94, 0.06), rgba(0, 0, 0, 0) 40%), var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem 3rem 2.5rem;
+  overflow: hidden;
+}
+
+.aur-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(184, 147, 95, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 147, 95, 0.06) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 45%, black 40%, transparent 85%);
+}
+
+.aur-brandmark {
+  position: relative;
+  z-index: 1;
+}
+
+.aur-brandmark .aur-mark {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.aur-brandmark .aur-mark em {
+  font-style: italic;
+  color: var(--brass);
+}
+
+.aur-brandmark .aur-tag {
+  margin-top: 0.4rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.aur-illustration {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+}
+
+.aur-blueprint-path {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2600;
+  stroke-dashoffset: 2600;
+  animation: aur-draw 2.6s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
+  opacity: 0.9;
+}
+
+.aur-blueprint-detail {
+  fill: none;
+  stroke: var(--text-faint);
+  stroke-width: 1;
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: aur-draw 1.8s ease 1.4s forwards;
+}
+
+.aur-blueprint-wheel {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.4;
+  opacity: 0;
+  animation: aur-fade 0.6s ease 2.1s forwards;
+}
+
+@keyframes aur-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes aur-fade {
+  to {
+    opacity: 0.85;
+  }
+}
+
+.aur-showroom-footer {
+  position: relative;
+  z-index: 1;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.aur-showroom-footer strong {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ---------- Right: form panel ---------- */
+.aur-formside {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.aur-formwrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.aur-heading {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 0 0 0.4rem;
+  letter-spacing: 0.01em;
+}
+
+.aur-subheading {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0 0 2.25rem;
+  line-height: 1.5;
+}
+
+.aur-field {
+  margin-bottom: 1.35rem;
+}
+
+.aur-label {
+  display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.5rem;
+}
+
+.aur-input-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.aur-input-shell:focus-within {
+  background: var(--surface-focus);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(92, 122, 94, 0.16);
+}
+
+.aur-input-shell input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.92rem;
+  padding: 0.8rem 0.9rem;
+}
+
+.aur-input-shell input::placeholder {
+  color: var(--text-faint);
+}
+
+.aur-eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  padding: 0 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.aur-eye-btn:hover {
+  color: var(--text-muted);
+}
+
+/* ---------- Dynamic feedback: password strength + match hint ---------- */
+.aur-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.aur-strength-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.aur-strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.aur-strength-fill.aur-strength-weak {
+  background: var(--danger);
+}
+
+.aur-strength-fill.aur-strength-medium {
+  background: var(--brass);
+}
+
+.aur-strength-fill.aur-strength-strong {
+  background: var(--green);
+}
+
+.aur-strength-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.aur-strength-label.aur-strength-weak {
+  color: var(--danger);
+}
+
+.aur-strength-label.aur-strength-medium {
+  color: var(--brass-bright);
+}
+
+.aur-strength-label.aur-strength-strong {
+  color: var(--green);
+}
+
+.aur-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+}
+
+.aur-hint-good {
+  color: var(--green);
+}
+
+.aur-hint-bad {
+  color: var(--danger);
+}
+
+/* ---------- Error banner ---------- */
+.aur-error {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.82rem;
+  color: var(--danger);
+  background: rgba(192, 106, 82, 0.08);
+  border: 1px solid rgba(192, 106, 82, 0.3);
+  border-radius: 3px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 1.35rem;
+}
+
+/* ---------- Submit button ---------- */
+.aur-submit {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+  border: none;
+  border-radius: 3px;
+  color: #14110c;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.aur-submit:hover:not(:disabled) {
+  box-shadow: 0 0 0 4px rgba(184, 147, 95, 0.16);
+}
+
+.aur-submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.aur-submit:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+.aur-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(20, 17, 12, 0.35);
+  border-top-color: #14110c;
+  border-radius: 50%;
+  animation: aur-spin 0.7s linear infinite;
+}
+
+@keyframes aur-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Switch link under the form ---------- */
+.aur-switch {
+  margin-top: 1.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.aur-switch a {
+  color: var(--brass-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Accessibility & responsiveness ---------- */
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aur-blueprint-path,
+  .aur-blueprint-detail,
+  .aur-blueprint-wheel {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 0.85;
+  }
+}
+
+@media (max-width: 860px) {
+  .aur-root {
+    flex-direction: column;
+  }
+
+  .aur-showroom {
+    flex: none;
+    min-height: auto;
+    padding: 1.75rem 1.75rem 1.25rem;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .aur-illustration {
+    display: none;
+  }
+
+  .aur-showroom-footer {
+    display: none;
+  }
+
+  .aur-formside {
+    padding: 2.5rem 1.5rem 3.5rem;
+  }
+}
