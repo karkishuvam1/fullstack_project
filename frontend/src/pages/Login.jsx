@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
 import EyeIcon from "../components/auth/EyeIcon";
+import { loginUser } from "../services/Authservice";
 import "../styles/auth.css";
 
 export default function Login() {
@@ -12,6 +13,7 @@ export default function Login() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -25,13 +27,18 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // TODO: replace this with your real API call, e.g.
-      // const res = await axios.post("/api/auth/login", { email, password });
-      // save the returned token, then redirect the user.
-      await new Promise((resolve) => setTimeout(resolve, 1200)); // demo delay
-    // eslint-disable-next-line no-unused-vars
-    } catch (err) {
-      setError("Could not sign in. Please check your details and try again.");
+      const data = await loginUser({ email, password });
+ 
+      // Save the token and user info so the rest of the app knows
+      // someone is logged in. (We'll move this into AuthContext later
+      // so every page can read it, not just this one.)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+ 
+      navigate("/");
+    } catch (err){
+      const message = err.response?.data?.message || "Could not sign in. Please try again.";
+      setError(message);
     } finally {
       setLoading(false);
     }

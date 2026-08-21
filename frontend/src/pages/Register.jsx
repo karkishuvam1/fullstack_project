@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
 import EyeIcon from "../components/auth/EyeIcon";
-import { getPasswordStrength } from "../utils/validators";
+import { getPasswordStrength } from "../utils/Validators";
+import { registerUser } from "../services/Authservice";
 import "../styles/auth.css";
 
 export default function Register() {
@@ -16,6 +17,9 @@ export default function Register() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
   const strength = getPasswordStrength(password);
   const passwordsMatch = confirmPassword.length > 0 && confirmPassword === password;
   const passwordsMismatch = confirmPassword.length > 0 && confirmPassword !== password;
@@ -40,12 +44,15 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // TODO: replace this with your real API call, e.g.
-      // const res = await axios.post("/api/auth/register", { name, email, password });
-      await new Promise((resolve) => setTimeout(resolve, 1200)); // demo delay
-    // eslint-disable-next-line no-unused-vars
+      const data = await registerUser({ name, email, password });
+ 
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+ 
+      navigate("/");
     } catch (err) {
-      setError("Could not create your account. Please try again.");
+      const message = err.response?.data?.message || "Could not create your account. Please try again.";
+      setError(message);
     } finally {
       setLoading(false);
     }
