@@ -1,10 +1,10 @@
 import React from 'react';
-import Navbar from '../components/common/Navbar';
-import Footer from '../components/common/Footer';
-import HeroSection from '../components/home/HeroSection';
-import FeaturedCars from '../components/home/FeaturedCars';
-import Testimonials from '../components/home/Testimonials';
-import Newsletter from '../components/home/Newsletter';
+import Navbar from '../common/Navbar';
+import Footer from '../common/Footer';
+import HeroSection from '../home/HeroSection';
+import FeaturedCars from '../home/FeaturedCars';
+import Testimonials from '../home/Testimonials';
+import Newsletter from '../home/Newsletter';
 
 const Home = () => {
   return (
