@@ -8,27 +8,23 @@ const cars = [
 
 const FeaturedCars = () => {
   return (
-    <section className="py-20 bg-neutral-900 text-white px-8">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black uppercase tracking-wider mb-12 border-l-4 border-yellow-500 pl-4">
-          Models
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {cars.map((car) => (
-            <div key={car.id} className="bg-black border border-neutral-800 group hover:border-yellow-500 transition-all overflow-hidden">
-              <div className="h-64 overflow-hidden">
-                <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold uppercase mb-2">{car.name}</h3>
-                <p className="text-neutral-400 text-sm mb-4">{car.engine} • {car.power}</p>
-                <button className="w-full py-2 border border-neutral-700 text-sm uppercase tracking-wider hover:bg-yellow-500 hover:text-black transition-colors">
-                  View Specs
-                </button>
-              </div>
+    <section className="lambo-featured-section">
+      <h2 className="section-title">Models</h2>
+      <div className="lambo-car-grid">
+        {cars.map((car) => (
+          <div key={car.id} className="lambo-car-card lambo-cut">
+            <div className="car-card-img-wrapper">
+              <img src={car.image} alt={car.name} />
             </div>
-          ))}
-        </div>
+            <div className="car-card-content">
+              <h3 className="car-card-title">{car.name}</h3>
+              <p className="car-card-specs">{car.engine} • {car.power}</p>
+              <button className="lambo-btn-outline" style={{ width: '100%' }}>
+                View Specs
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
