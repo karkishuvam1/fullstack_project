@@ -35,7 +35,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
  
-      navigate("/");
+      navigate("/home");
     } catch (err){
       const message = err.response?.data?.message || "Could not sign in. Please try again.";
       setError(message);

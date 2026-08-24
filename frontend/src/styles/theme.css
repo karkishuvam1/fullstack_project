@@ -1,0 +1,481 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,500&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* ---------- Shared design tokens (same palette as auth.css) ---------- */
+:root {
+  --bg: #0b0d0f;
+  --panel: #121519;
+  --surface: #191d22;
+  --surface-focus: #1e2329;
+  --border: #262b31;
+  --text: #ece8e1;
+  --text-muted: #8b9096;
+  --text-faint: #565c62;
+  --brass: #b8935f;
+  --brass-bright: #d4af7a;
+  --green: #5c7a5e;
+  --danger: #c06a52;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+/* ---------- Page shell: sidebar + main content ---------- */
+.ap-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.ap-sidebar {
+  flex: 0 0 240px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem 1.25rem;
+}
+
+.ap-sidebar-brand {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.15rem;
+}
+
+.ap-sidebar-brand em {
+  font-style: italic;
+  color: var(--brass);
+}
+
+.ap-sidebar-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 2rem;
+}
+
+.ap-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ap-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 3px;
+  border-left: 2px solid transparent;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ap-nav-link:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.ap-nav-link.active {
+  background: var(--surface);
+  color: var(--text);
+  border-left-color: var(--brass);
+}
+
+.ap-sidebar-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.ap-logout-btn {
+  width: 100%;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.85rem;
+  padding: 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.ap-logout-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ---------- Main content area ---------- */
+.ap-main {
+  flex: 1;
+  padding: 2.25rem 2.5rem 3rem;
+  max-width: 1160px;
+}
+
+.ap-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.ap-page-title {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.ap-page-subtitle {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: 0.3rem 0 0;
+}
+
+.ap-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ap-user-chip-name {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Avatar ---------- */
+.ap-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+  color: #14110c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.ap-avatar-lg {
+  width: 84px;
+  height: 84px;
+  font-size: 1.6rem;
+}
+
+/* ---------- Cards ---------- */
+.ap-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+
+.ap-card-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0 0 1.1rem;
+}
+
+/* ---------- Stat cards ---------- */
+.ap-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.ap-stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.25rem 1.4rem;
+}
+
+.ap-stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0 0 0.6rem;
+}
+
+.ap-stat-value {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 1.9rem;
+  margin: 0;
+}
+
+.ap-stat-value.brass { color: var(--brass-bright); }
+.ap-stat-value.green { color: var(--green); }
+
+/* ---------- Table ---------- */
+.ap-table-wrap {
+  overflow-x: auto;
+}
+
+.ap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.ap-table th {
+  text-align: left;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 400;
+  padding: 0 0.9rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.ap-table td {
+  padding: 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.ap-table tbody tr:hover {
+  background: var(--surface);
+}
+
+.ap-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ap-cell-muted {
+  color: var(--text-muted);
+}
+
+.ap-cell-mono {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Badges ---------- */
+.ap-badge {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.ap-badge-green {
+  color: var(--green);
+  background: rgba(92, 122, 94, 0.12);
+  border-color: rgba(92, 122, 94, 0.3);
+}
+
+.ap-badge-brass {
+  color: var(--brass-bright);
+  background: rgba(184, 147, 95, 0.12);
+  border-color: rgba(184, 147, 95, 0.3);
+}
+
+.ap-badge-danger {
+  color: var(--danger);
+  background: rgba(192, 106, 82, 0.12);
+  border-color: rgba(192, 106, 82, 0.3);
+}
+
+.ap-badge-muted {
+  color: var(--text-muted);
+  background: rgba(139, 144, 150, 0.1);
+  border-color: var(--border);
+}
+
+/* ---------- Buttons ---------- */
+.ap-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border-radius: 3px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: box-shadow 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+}
+
+.ap-btn:active {
+  transform: scale(0.98);
+}
+
+.ap-btn-primary {
+  background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+  color: #14110c;
+}
+
+.ap-btn-primary:hover {
+  box-shadow: 0 0 0 4px rgba(184, 147, 95, 0.16);
+}
+
+.ap-btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.ap-btn-ghost:hover {
+  color: var(--text);
+  border-color: var(--border-strong, var(--text-faint));
+}
+
+.ap-btn-danger {
+  background: transparent;
+  border-color: rgba(192, 106, 82, 0.35);
+  color: var(--danger);
+}
+
+.ap-btn-danger:hover {
+  background: rgba(192, 106, 82, 0.1);
+}
+
+.ap-btn-sm {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.76rem;
+}
+
+.ap-icon-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 3px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.ap-icon-btn:hover {
+  color: var(--text);
+  border-color: var(--text-faint);
+}
+
+.ap-icon-btn.danger:hover {
+  color: var(--danger);
+  border-color: rgba(192, 106, 82, 0.4);
+}
+
+/* ---------- Form fields (same visual language as auth) ---------- */
+.ap-field {
+  margin-bottom: 1.25rem;
+}
+
+.ap-label {
+  display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.5rem;
+}
+
+.ap-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.92rem;
+  padding: 0.75rem 0.9rem;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ap-input:focus {
+  outline: none;
+  background: var(--surface-focus);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(92, 122, 94, 0.16);
+}
+
+.ap-hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.ap-success-msg {
+  font-size: 0.82rem;
+  color: var(--green);
+  background: rgba(92, 122, 94, 0.08);
+  border: 1px solid rgba(92, 122, 94, 0.3);
+  border-radius: 3px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- Profile page grid ---------- */
+.ap-profile-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .ap-profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Empty state ---------- */
+.ap-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-faint);
+  font-size: 0.88rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .ap-shell {
+    flex-direction: column;
+  }
+  .ap-sidebar {
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .ap-sidebar-brand, .ap-sidebar-sub { display: none; }
+  .ap-nav { flex-direction: row; }
+  .ap-sidebar-footer { display: none; }
+  .ap-main { padding: 1.5rem; }
+}
