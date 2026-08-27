@@ -1,0 +1,383 @@
+/* ==========================================================================
+   ADMIN PANEL STYLES
+   Location: src/styles/Admin.css
+
+   IMPORTANT: this file does NOT redefine --lambo-gold, --lambo-black, etc.
+   The admin root element also carries the "lambo-home-page" class (see
+   AdminLayout.jsx) purely so it inherits the same CSS variables, font
+   resets, and the .lambo-btn-gold / .lambo-btn-outline / .lambo-cut
+   utility classes already defined in Home.css. That's what guarantees the
+   admin panel can never visually drift from the homepage — they're both
+   reading color/font values from the exact same source.
+
+   This file only adds admin-specific layout: sidebar, topbar, stat cards,
+   tables, badges.
+   ========================================================================== */
+
+.lambo-admin-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ---------- Sidebar ---------- */
+.lambo-admin-sidebar {
+  flex: 0 0 250px;
+  background: var(--lambo-card-bg);
+  border-right: 1px solid var(--lambo-border);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+}
+
+.lambo-admin-logo {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lambo-gold);
+  margin-bottom: 0.15rem;
+}
+
+.lambo-admin-sublabel {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lambo-text-gray);
+  margin-bottom: 2.5rem;
+}
+
+.lambo-admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.lambo-admin-nav-link {
+  position: relative;
+  display: block;
+  color: var(--lambo-text-gray);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.75rem 0.9rem;
+  border-left: 2px solid transparent;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.lambo-admin-nav-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lambo-admin-nav-link.active {
+  color: var(--lambo-gold);
+  border-left-color: var(--lambo-gold);
+  background: rgba(229, 184, 0, 0.06);
+}
+
+.lambo-admin-sidebar-footer {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--lambo-border);
+}
+
+.lambo-admin-logout {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+}
+
+/* ---------- Main content ---------- */
+.lambo-admin-main {
+  flex: 1;
+  padding: 2.5rem 3rem 4rem;
+  max-width: 1200px;
+}
+
+.lambo-admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.lambo-admin-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-left: 4px solid var(--lambo-gold);
+  padding-left: 1rem;
+}
+
+.lambo-admin-subtitle {
+  color: var(--lambo-text-gray);
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0 1.25rem;
+}
+
+.lambo-admin-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lambo-admin-user-name {
+  font-size: 0.8rem;
+  color: var(--lambo-text-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lambo-admin-avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--lambo-gold);
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* ---------- Stat cards ---------- */
+.lambo-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.lambo-stat-card {
+  background: var(--lambo-card-bg);
+  border: 1px solid var(--lambo-border);
+  padding: 1.5rem 1.6rem;
+}
+
+.lambo-stat-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lambo-text-gray);
+  margin-bottom: 0.6rem;
+}
+
+.lambo-stat-value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.lambo-stat-value.gold {
+  color: var(--lambo-gold);
+}
+
+/* ---------- Cards ---------- */
+.lambo-admin-card {
+  background: var(--lambo-card-bg);
+  border: 1px solid var(--lambo-border);
+  padding: 1.75rem;
+}
+
+.lambo-admin-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.lambo-admin-card-title {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lambo-text-gray);
+  margin: 0;
+}
+
+/* ---------- Table ---------- */
+.lambo-admin-table-wrap {
+  overflow-x: auto;
+}
+
+.lambo-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.lambo-admin-table th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lambo-text-gray);
+  font-weight: 500;
+  padding: 0 1rem 0.85rem;
+  border-bottom: 1px solid var(--lambo-border);
+  white-space: nowrap;
+}
+
+.lambo-admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--lambo-border);
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+.lambo-admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.lambo-admin-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lambo-admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-muted {
+  color: var(--lambo-text-gray);
+}
+
+.cell-mono {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--lambo-text-gray);
+}
+
+/* ---------- Badges ---------- */
+.lambo-badge {
+  display: inline-block;
+  padding: 0.28rem 0.7rem;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.lambo-badge-gold {
+  color: var(--lambo-gold);
+  background: rgba(229, 184, 0, 0.1);
+  border-color: rgba(229, 184, 0, 0.35);
+}
+
+.lambo-badge-green {
+  color: #7fd188;
+  background: rgba(127, 209, 136, 0.1);
+  border-color: rgba(127, 209, 136, 0.3);
+}
+
+.lambo-badge-danger {
+  color: #e57373;
+  background: rgba(224, 115, 115, 0.1);
+  border-color: rgba(192, 57, 43, 0.4);
+}
+
+.lambo-badge-muted {
+  color: var(--lambo-text-gray);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--lambo-border);
+}
+
+/* ---------- Row icon buttons (edit / delete) ---------- */
+.lambo-icon-btn {
+  background: none;
+  border: 1px solid var(--lambo-border);
+  color: var(--lambo-text-gray);
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.lambo-icon-btn:hover {
+  color: var(--lambo-gold);
+  border-color: var(--lambo-gold);
+}
+
+.lambo-icon-btn.danger:hover {
+  color: #e57373;
+  border-color: #c0392b;
+}
+
+/* ---------- Row avatar (used in Manage Users) ---------- */
+.lambo-row-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--lambo-gold);
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.lambo-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--lambo-text-gray);
+  font-size: 0.88rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .lambo-admin-page {
+    flex-direction: column;
+  }
+  .lambo-admin-sidebar {
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-right: none;
+    border-bottom: 1px solid var(--lambo-border);
+  }
+  .lambo-admin-logo,
+  .lambo-admin-sublabel,
+  .lambo-admin-sidebar-footer {
+    display: none;
+  }
+  .lambo-admin-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .lambo-admin-nav-link {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+  .lambo-admin-nav-link.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--lambo-gold);
+  }
+  .lambo-admin-main {
+    padding: 1.75rem 1.25rem 3rem;
+  }
+}
