@@ -4,6 +4,7 @@ import AuthLayout from "../components/auth/AuthLayout";
 import EyeIcon from "../components/auth/EyeIcon";
 import { getPasswordStrength } from "../utils/Validators";
 import { registerUser } from "../services/Authservice";
+import { useAuth } from "../context/AuthContext";
 import "../styles/auth.css";
 
 export default function Register() {
@@ -19,6 +20,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const strength = getPasswordStrength(password);
   const passwordsMatch = confirmPassword.length > 0 && confirmPassword === password;
@@ -45,11 +47,8 @@ export default function Register() {
 
     try {
       const data = await registerUser({ name, email, password });
- 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
- 
-      navigate("/");
+      login(data);
+      navigate("/home");
     } catch (err) {
       const message = err.response?.data?.message || "Could not create your account. Please try again.";
       setError(message);
