@@ -4,6 +4,7 @@ import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 import { useAuth } from '../context/AuthContext';
 import { getMyBookings, getAllBookings, updateBookingStatus } from '../services/TestDriveService';
+import { getImageUrl, handleImageError } from '../utils/imageUrl';
 import '../styles/Home.css';
 
 const STATUS_STYLES = {
@@ -230,14 +231,13 @@ export default function Dashboard() {
                       onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--lambo-gold)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--lambo-border)'; }}
                       >
-                        <div style={{ position: 'relative', height: '170px', background: '#050505' }}>
-                          {b.car?.image && (
-                            <img
-                              src={b.car.image}
-                              alt={b.car.name}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
-                            />
-                          )}
+                        <div style={{ position: 'relative', height: '170px', background: '#050505', overflow: 'hidden' }}>
+                          <img
+                            src={getImageUrl(b.car?.image, b.car?.slug)}
+                            alt={b.car?.name || 'Lamborghini'}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
+                            onError={(e) => handleImageError(e, b.car?.slug)}
+                          />
                           <div style={{
                             position: 'absolute',
                             top: '1rem',

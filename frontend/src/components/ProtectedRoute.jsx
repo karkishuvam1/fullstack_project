@@ -14,24 +14,26 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
           alignItems: "center",
           minHeight: "100vh",
           background: "#080808",
-          color: "var(--lambo-gold, #e5b800)",
+          color: "#e5b800",
           fontFamily: "var(--font-display, sans-serif)",
           fontSize: "1.2rem",
           letterSpacing: "0.1em",
           textTransform: "uppercase",
         }}
       >
-        Loading...
+        Authenticating...
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (adminOnly && !isAdmin) {
-    return <Navigate to="/home" replace />;
+  if (adminOnly) {
+    if (!isAuthenticated || !isAdmin) {
+      return <Navigate to="/admin/login" replace />;
+    }
+  } else {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
   }
 
   return children;

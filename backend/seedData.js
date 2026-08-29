@@ -287,39 +287,94 @@ const seedCars = [
     status: "Active",
     isActive: true,
   },
+  {
+    name: "Aventador SVJ",
+    slug: "aventador-svj",
+    category: "Limited Edition",
+    year: 2023,
+    power: "770 CV",
+    engine: "6.5L V12 Naturally Aspirated",
+    topSpeed: "352 km/h",
+    zeroToHundred: "2.8 s",
+    weight: "1,525 kg",
+    transmission: "7-speed ISR",
+    drivetrain: "AWD",
+    image: "/uploads/aventador-svj.jpg",
+    gallery: [
+      "/uploads/aventador-svj.jpg",
+    ],
+    blurb:
+      "The pinnacle of the Aventador family, engineered for unmatched track dominance with ALA 2.0 active aerodynamics.",
+    description:
+      "The Aventador SVJ is the ultimate expression of Lamborghini's super sports car heritage. Powered by a naturally aspirated 6.5-liter V12 producing 770 CV, it features Aerodinamica Lamborghini Attiva 2.0 (ALA 2.0) and lightweight carbon fiber engineering.",
+    startingPrice: 517770,
+    features: [
+      "6.5L Naturally Aspirated V12",
+      "ALA 2.0 Active Aerodynamics",
+      "Carbon Fiber Monocoque & Wing",
+      "4-Wheel Steering",
+      "Magnetorheological Pushrod Suspension",
+    ],
+    availableColors: [
+      { name: "Verde Alceo", hex: "#2E8B57", price: 12000 },
+      { name: "Giallo Orion", hex: "#FFD700", price: 9500 },
+      { name: "Nero Nemesis", hex: "#111111", price: 0 },
+    ],
+    rating: 5.0,
+    numReviews: 11,
+    inStock: true,
+    status: "Active",
+    isActive: true,
+  },
 ];
 
-async function seedData() {
+async function seedData(silent = false) {
   try {
-    await connectDB();
-
-    console.log("Clearing existing User & Car data...");
-    await User.deleteMany({});
-    await Car.deleteMany({});
-
-    console.log("Seeding Users...");
-    for (const userData of seedUsers) {
-      await User.create(userData);
+    // Always ensure default admin user exists
+    let admin = await User.findOne({ email: "admin@example.com" });
+    if (!admin) {
+      if (!silent) console.log("Seeding default Administrator user...");
+      admin = new User({
+        name: "System Administrator",
+        email: "admin@example.com",
+        password: "adminpassword123",
+        role: "admin",
+        phone: "+1 (555) 019-2834",
+      });
+      await admin.save();
+      if (!silent) console.log("Admin user created: admin@example.com / adminpassword123");
     }
-    console.log(`Successfully seeded ${seedUsers.length} users (Admin & Buyers).`);
 
-    console.log("Seeding Cars...");
-    const createdCars = await Car.insertMany(seedCars);
-    console.log(`Successfully seeded ${createdCars.length} cars:`);
-    createdCars.forEach((car) => {
-      console.log(`  - [${car.category}] ${car.name} (${car.slug}) -> ${car.image}`);
-    });
+    const userCount = await User.countDocuments();
+    if (userCount <= 1) {
+      if (!silent) console.log("Seeding Buyer Users...");
+      for (const userData of seedUsers.filter(u => u.email !== "admin@example.com")) {
+        const exists = await User.findOne({ email: userData.email });
+        if (!exists) {
+          await User.create(userData);
+        }
+      }
+    }
 
-    console.log("Seeding completed successfully!");
-    process.exit(0);
+    const carCount = await Car.countDocuments();
+    if (carCount < 6) {
+      if (!silent) console.log("Clearing & Seeding full Cars catalogue...");
+      await Car.deleteMany({});
+      const createdCars = await Car.insertMany(seedCars);
+      if (!silent) console.log(`Successfully seeded ${createdCars.length} cars across all categories.`);
+    }
+
+    if (!silent) console.log("Database initialized successfully!");
   } catch (error) {
-    console.error("Seed failed:", error.message);
-    process.exit(1);
+    if (!silent) console.error("Seed error:", error.message);
   }
 }
 
 if (require.main === module) {
-  seedData();
+  connectDB().then(async () => {
+    await seedData(false);
+    process.exit(0);
+  });
 }
 
-module.exports = { seedUsers, seedCars };
+module.exports = { seedUsers, seedCars, seedData };

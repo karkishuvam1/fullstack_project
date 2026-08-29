@@ -9,7 +9,8 @@ const { protect, admin } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/", bookTestDrive);
+// Strict: Test drive booking requires logged-in client (protect middleware)
+router.post("/", protect, bookTestDrive);
 router.post("/protected", protect, bookTestDrive);
 router.get("/my-bookings", protect, getMyBookings);
 router.get("/all", protect, admin, getAllBookings);

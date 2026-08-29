@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 import { getCars } from '../services/CarService';
+import { getImageUrl, handleImageError } from '../utils/imageUrl';
 import '../styles/Home.css';
 
 const fallbackCars = [
@@ -185,7 +186,13 @@ export default function Cars() {
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
                   <div className="car-card-img-wrapper">
-                    <img src={car.image} alt={`Lamborghini ${car.name}`} loading="lazy" />
+                    <img
+                      src={getImageUrl(car.image, car.slug)}
+                      alt={`Lamborghini ${car.name}`}
+                      loading="lazy"
+                      onError={(e) => handleImageError(e, car.slug)}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   </div>
                   <div className="car-card-content">
                     <span style={{
@@ -221,7 +228,9 @@ export default function Cars() {
                       </div>
                       <div>
                         <p style={{ fontSize: '0.6rem', color: 'var(--lambo-text-gray)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.2rem' }}>Price</p>
-                        <p style={{ fontFamily: 'var(--font-display)', fontSize: '0.8rem', fontWeight: 700, color: 'var(--lambo-gold)' }}>From</p>
+                        <p style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', fontWeight: 700, color: 'var(--lambo-gold)' }}>
+                          {car.startingPrice ? `From ${formatPrice(car.startingPrice)}` : 'P.O.A.'}
+                        </p>
                       </div>
                     </div>
                     <button

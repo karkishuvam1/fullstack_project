@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { getCars, createCar, updateCar, deleteCar } from "../../services/CarService";
+import { getImageUrl, handleImageError } from "../../utils/imageUrl";
 import "../../styles/theme.css";
+
+const CATEGORIES = ["All", "Super Sports", "Super SUV", "Limited Edition"];
 
 export default function ManageCars() {
   const [cars, setCars] = useState([]);
@@ -9,6 +12,8 @@ export default function ManageCars() {
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Form State
   const initialFormData = {
@@ -28,6 +33,7 @@ export default function ManageCars() {
     description: "",
     startingPrice: "",
     status: "Active",
+    isActive: true,
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -51,7 +57,7 @@ export default function ManageCars() {
   }
 
   async function handleDelete(id, name) {
-    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
+    if (!window.confirm(`Are you sure you want to permanently remove "${name}" from inventory?`)) return;
     try {
       await deleteCar(id);
       setCars((prev) => prev.filter((c) => (c._id || c.id) !== id));
@@ -84,7 +90,8 @@ export default function ManageCars() {
       blurb: car.blurb || "",
       description: car.description || "",
       startingPrice: car.startingPrice || "",
-      status: car.status || "Active",
+      status: car.status || (car.isActive ? "Active" : "Draft"),
+      isActive: car.isActive !== undefined ? car.isActive : true,
     });
     setShowModal(true);
   }
@@ -110,26 +117,88 @@ export default function ManageCars() {
     }
   }
 
+  const filteredCars = cars.filter((car) => {
+    const matchesCategory =
+      selectedCategory === "All" || car.category === selectedCategory;
+    const matchesSearch =
+      searchQuery.trim() === "" ||
+      car.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      car.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      car.engine?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
   return (
-    <AdminLayout title="Manage Cars" subtitle={`${cars.length} vehicles in inventory`}>
+    <AdminLayout title="Manage Inventory" subtitle={`${cars.length} vehicles registered in dealership catalogue`}>
       <div className="ap-card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.1rem" }}>
-          <p className="ap-card-title" style={{ margin: 0 }}>Inventory Listings</p>
-          <button className="ap-btn ap-btn-primary ap-btn-sm" onClick={handleOpenAdd}>
-            + Add New Car
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem", flexWrap: "wrap", gap: "1rem" }}>
+          <div>
+            <p className="ap-card-title" style={{ margin: 0 }}>Supercar Inventory</p>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", margin: "0.2rem 0 0" }}>
+              Add, update specifications, adjust pricing, or remove vehicles.
+            </p>
+          </div>
+          <button className="ap-btn ap-btn-primary" onClick={handleOpenAdd}>
+            + Add New Model
           </button>
         </div>
 
+        {/* Filters and Search Bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "0.75rem" }}>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                style={{
+                  padding: "0.45rem 1rem",
+                  fontSize: "0.75rem",
+                  fontFamily: "var(--font-display)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  borderRadius: "4px",
+                  border: `1px solid ${selectedCategory === cat ? "var(--lambo-gold, #e5b800)" : "var(--border)"}`,
+                  background: selectedCategory === cat ? "rgba(229, 184, 0, 0.15)" : "transparent",
+                  color: selectedCategory === cat ? "var(--lambo-gold, #e5b800)" : "var(--text-muted)",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <input
+            type="text"
+            placeholder="Search by name, engine..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              padding: "0.5rem 1rem",
+              background: "#08080a",
+              border: "1px solid var(--border)",
+              color: "#fff",
+              borderRadius: "4px",
+              fontSize: "0.82rem",
+              outline: "none",
+              minWidth: "240px",
+            }}
+          />
+        </div>
+
         {error && (
-          <div style={{ padding: "0.75rem", background: "rgba(192, 106, 82, 0.15)", color: "#ff8b80", borderRadius: "4px", marginBottom: "1rem" }}>
+          <div style={{ padding: "0.75rem 1rem", background: "rgba(192, 106, 82, 0.15)", color: "#ff8b80", borderRadius: "4px", marginBottom: "1rem" }}>
             {error}
           </div>
         )}
 
         {loading ? (
-          <p className="ap-empty">Loading inventory...</p>
-        ) : cars.length === 0 ? (
-          <p className="ap-empty">No cars in inventory yet. Click "+ Add New Car" to create one.</p>
+          <p className="ap-empty">Loading inventory catalogue...</p>
+        ) : filteredCars.length === 0 ? (
+          <p className="ap-empty">No vehicles match the selected criteria. Click "+ Add New Model" to register one.</p>
         ) : (
           <div className="ap-table-wrap">
             <table className="ap-table">
@@ -140,34 +209,55 @@ export default function ManageCars() {
                   <th>Specs</th>
                   <th>Starting Price</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {cars.map((car) => {
+                {filteredCars.map((car) => {
                   const carId = car._id || car.id;
                   return (
                     <tr key={carId}>
                       <td>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                          {car.image && (
-                            <img
-                              src={car.image}
-                              alt={car.name}
-                              style={{ width: "48px", height: "32px", objectFit: "cover", borderRadius: "3px" }}
-                            />
-                          )}
+                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                          <img
+                            src={getImageUrl(car.image, car.slug)}
+                            alt={car.name}
+                            onError={(e) => handleImageError(e, car.slug)}
+                            style={{
+                              width: "72px",
+                              height: "48px",
+                              objectFit: "cover",
+                              borderRadius: "4px",
+                              border: "1px solid var(--border)",
+                              background: "#050505",
+                            }}
+                          />
                           <div>
-                            <strong>{car.name}</strong>
-                            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{car.slug}</div>
+                            <strong style={{ color: "#fff", fontSize: "0.95rem" }}>{car.name}</strong>
+                            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "monospace" }}>
+                              /{car.slug}
+                            </div>
                           </div>
                         </div>
                       </td>
-                      <td className="ap-cell-muted">{car.category}</td>
-                      <td style={{ fontSize: "0.8rem" }}>
-                        {car.power} • {car.topSpeed}
+                      <td>
+                        <span style={{
+                          fontSize: "0.72rem",
+                          color: "var(--lambo-gold, #e5b800)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.08em",
+                          fontFamily: "var(--font-display)",
+                        }}>
+                          {car.category}
+                        </span>
                       </td>
-                      <td className="ap-td-bold">
+                      <td style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                        <div>{car.engine || "—"}</div>
+                        <div style={{ color: "#fff", fontWeight: 600, fontSize: "0.78rem" }}>
+                          {car.power} • {car.topSpeed}
+                        </div>
+                      </td>
+                      <td className="ap-td-bold" style={{ color: "var(--lambo-gold, #e5b800)" }}>
                         {new Intl.NumberFormat("en-US", {
                           style: "currency",
                           currency: "EUR",
@@ -177,21 +267,23 @@ export default function ManageCars() {
                       <td>
                         <StatusBadge status={car.status || (car.isActive ? "Active" : "Draft")} />
                       </td>
-                      <td>
-                        <div style={{ display: "flex", gap: "0.4rem" }}>
+                      <td style={{ textAlign: "right" }}>
+                        <div style={{ display: "inline-flex", gap: "0.5rem" }}>
                           <button
                             className="ap-icon-btn"
-                            aria-label={`Edit ${car.name}`}
+                            title={`Edit ${car.name}`}
                             onClick={() => handleOpenEdit(car)}
+                            style={{ padding: "0.4rem 0.6rem", background: "rgba(229, 184, 0, 0.1)", border: "1px solid rgba(229, 184, 0, 0.3)", color: "#e5b800" }}
                           >
-                            <EditIcon />
+                            Edit
                           </button>
                           <button
                             className="ap-icon-btn danger"
-                            aria-label={`Delete ${car.name}`}
+                            title={`Delete ${car.name}`}
                             onClick={() => handleDelete(carId, car.name)}
+                            style={{ padding: "0.4rem 0.6rem", background: "rgba(192, 106, 82, 0.1)", border: "1px solid rgba(192, 106, 82, 0.3)", color: "#ff8b80" }}
                           >
-                            <TrashIcon />
+                            Delete
                           </button>
                         </div>
                       </td>
@@ -210,74 +302,80 @@ export default function ManageCars() {
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.75)",
-            backdropFilter: "blur(4px)",
+            background: "rgba(0,0,0,0.85)",
+            backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             zIndex: 999,
-            padding: "1rem",
+            padding: "1.5rem",
           }}
         >
           <div
             style={{
-              background: "var(--card-bg, #121214)",
-              border: "1px solid var(--border)",
+              background: "linear-gradient(180deg, #131316 0%, #0c0c0e 100%)",
+              border: "1px solid rgba(229, 184, 0, 0.35)",
               borderRadius: "8px",
-              maxWidth: "680px",
+              maxWidth: "720px",
               width: "100%",
               maxHeight: "90vh",
               overflowY: "auto",
-              padding: "2rem",
+              padding: "2.25rem",
+              boxShadow: "0 25px 60px rgba(0,0,0,0.9)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h2 style={{ fontFamily: "var(--font-display)", color: "#fff", margin: 0, fontSize: "1.3rem" }}>
-                {editingCar ? `Edit ${editingCar.name}` : "Add New Supercar"}
-              </h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.75rem", borderBottom: "1px solid var(--border)", paddingBottom: "1rem" }}>
+              <div>
+                <span style={{ fontSize: "0.68rem", color: "var(--lambo-gold, #e5b800)", textTransform: "uppercase", letterSpacing: "0.15em", fontFamily: "var(--font-display)" }}>
+                  Dealership Inventory
+                </span>
+                <h2 style={{ fontFamily: "var(--font-display)", color: "#fff", margin: "0.2rem 0 0", fontSize: "1.4rem", textTransform: "uppercase" }}>
+                  {editingCar ? `Edit: ${editingCar.name}` : "Create New Vehicle Model"}
+                </h2>
+              </div>
               <button
                 onClick={() => setShowModal(false)}
-                style={{ background: "transparent", border: "none", color: "#aaa", fontSize: "1.5rem", cursor: "pointer" }}
+                style={{ background: "transparent", border: "none", color: "#aaa", fontSize: "1.6rem", cursor: "pointer" }}
               >
                 ×
               </button>
             </div>
 
             <form onSubmit={handleSubmit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
                 <div className="ap-field">
                   <label className="ap-label">Model Name *</label>
                   <input
                     className="ap-input"
                     type="text"
                     required
-                    placeholder="e.g. Temerario"
+                    placeholder="e.g. Revuelto"
                     value={formData.name}
                     onChange={(e) => {
                       const nameVal = e.target.value;
                       setFormData((p) => ({
                         ...p,
                         name: nameVal,
-                        slug: editingCar ? p.slug : nameVal.toLowerCase().replace(/\s+/g, "-"),
+                        slug: editingCar ? p.slug : nameVal.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-"),
                       }));
                     }}
                   />
                 </div>
 
                 <div className="ap-field">
-                  <label className="ap-label">Slug / URL identifier *</label>
+                  <label className="ap-label">URL Slug *</label>
                   <input
                     className="ap-input"
                     type="text"
                     required
-                    placeholder="e.g. temerario"
+                    placeholder="e.g. revuelto"
                     value={formData.slug}
                     onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
                   />
                 </div>
 
                 <div className="ap-field">
-                  <label className="ap-label">Category</label>
+                  <label className="ap-label">Category *</label>
                   <select
                     className="ap-input"
                     value={formData.category}
@@ -286,8 +384,6 @@ export default function ManageCars() {
                     <option value="Super Sports">Super Sports</option>
                     <option value="Super SUV">Super SUV</option>
                     <option value="Limited Edition">Limited Edition</option>
-                    <option value="Hypercars">Hypercars</option>
-                    <option value="Luxury">Luxury</option>
                   </select>
                 </div>
 
@@ -307,19 +403,19 @@ export default function ManageCars() {
                     className="ap-input"
                     type="text"
                     required
-                    placeholder="e.g. 920 CV"
+                    placeholder="e.g. 1015 CV"
                     value={formData.power}
                     onChange={(e) => setFormData((p) => ({ ...p, power: e.target.value }))}
                   />
                 </div>
 
                 <div className="ap-field">
-                  <label className="ap-label">Engine Spec *</label>
+                  <label className="ap-label">Engine Specification *</label>
                   <input
                     className="ap-input"
                     type="text"
                     required
-                    placeholder="e.g. V8 Twin-Turbo Hybrid"
+                    placeholder="e.g. V12 Hybrid"
                     value={formData.engine}
                     onChange={(e) => setFormData((p) => ({ ...p, engine: e.target.value }))}
                   />
@@ -331,19 +427,19 @@ export default function ManageCars() {
                     className="ap-input"
                     type="text"
                     required
-                    placeholder="e.g. 343 km/h"
+                    placeholder="e.g. > 350 km/h"
                     value={formData.topSpeed}
                     onChange={(e) => setFormData((p) => ({ ...p, topSpeed: e.target.value }))}
                   />
                 </div>
 
                 <div className="ap-field">
-                  <label className="ap-label">0-100 km/h Acceleration *</label>
+                  <label className="ap-label">0-100 km/h (sec) *</label>
                   <input
                     className="ap-input"
                     type="text"
                     required
-                    placeholder="e.g. 2.7 s"
+                    placeholder="e.g. 2.5 s"
                     value={formData.zeroToHundred}
                     onChange={(e) => setFormData((p) => ({ ...p, zeroToHundred: e.target.value }))}
                   />
@@ -355,7 +451,7 @@ export default function ManageCars() {
                     className="ap-input"
                     type="text"
                     required
-                    placeholder="e.g. 1,690 kg"
+                    placeholder="e.g. 1,772 kg"
                     value={formData.weight}
                     onChange={(e) => setFormData((p) => ({ ...p, weight: e.target.value }))}
                   />
@@ -368,50 +464,50 @@ export default function ManageCars() {
                     type="number"
                     required
                     min="0"
-                    placeholder="e.g. 360000"
+                    placeholder="e.g. 608358"
                     value={formData.startingPrice}
                     onChange={(e) => setFormData((p) => ({ ...p, startingPrice: e.target.value }))}
                   />
                 </div>
               </div>
 
-              <div className="ap-field" style={{ marginTop: "0.5rem" }}>
-                <label className="ap-label">Image URL * (or upload path like /uploads/temerario.jpg)</label>
+              <div className="ap-field" style={{ marginTop: "1rem" }}>
+                <label className="ap-label">Image Source * (URL or Uploads Path)</label>
                 <input
                   className="ap-input"
                   type="text"
                   required
-                  placeholder="https://... or /uploads/model.jpg"
+                  placeholder="https://... or /uploads/revuelto.jpg"
                   value={formData.image}
                   onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
                 />
               </div>
 
-              <div className="ap-field">
-                <label className="ap-label">Short Blurb *</label>
+              <div className="ap-field" style={{ marginTop: "1rem" }}>
+                <label className="ap-label">Short Tagline / Blurb *</label>
                 <input
                   className="ap-input"
                   type="text"
                   required
-                  placeholder="Short marketing hook"
+                  placeholder="The first V12 hybrid super sports car."
                   value={formData.blurb}
                   onChange={(e) => setFormData((p) => ({ ...p, blurb: e.target.value }))}
                 />
               </div>
 
-              <div className="ap-field">
-                <label className="ap-label">Full Description *</label>
+              <div className="ap-field" style={{ marginTop: "1rem" }}>
+                <label className="ap-label">Full Engineering Description *</label>
                 <textarea
                   className="ap-input"
                   rows="3"
                   required
-                  placeholder="Detailed background and engineering story..."
+                  placeholder="Comprehensive model description..."
                   value={formData.description}
                   onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
                 />
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1.5rem" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "2rem", borderTop: "1px solid var(--border)", paddingTop: "1.25rem" }}>
                 <button type="button" className="ap-btn ap-btn-ghost" onClick={() => setShowModal(false)}>
                   Cancel
                 </button>
@@ -433,23 +529,5 @@ function StatusBadge({ status }) {
     Draft: "ap-badge-muted",
     Sold: "ap-badge-brass",
   };
-  return <span className={`ap-badge ${toneByStatus[status] || "ap-badge-muted"}`}>{status}</span>;
-}
-
-function EditIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M3 6h18" />
-      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" />
-    </svg>
-  );
+  return <span className={`ap-badge ${toneByStatus[status] || "ap-badge-green"}`}>{status}</span>;
 }

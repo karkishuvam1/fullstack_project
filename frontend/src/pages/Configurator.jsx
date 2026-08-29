@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 import { getCars, getCarBySlug } from '../services/CarService';
+import { getImageUrl, handleImageError } from '../utils/imageUrl';
+import { useAuth } from '../context/AuthContext';
 import '../styles/Home.css';
 
 const fallbackCar = {
@@ -55,14 +57,34 @@ function formatPrice(price) {
 
 export default function Configurator() {
   const { slug } = useParams();
+  const { user, isAuthenticated } = useAuth();
   const [cars, setCars] = useState([]);
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [savedFeedback, setSavedFeedback] = useState(false);
 
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedWheel, setSelectedWheel] = useState(WHEELS[0].id);
   const [selectedInterior, setSelectedInterior] = useState(INTERIORS[0].id);
   const [selectedOptions, setSelectedOptions] = useState([]);
+
+  const handleSaveConfiguration = () => {
+    const configData = {
+      model: car?.name,
+      slug: car?.slug,
+      paint: car?.availableColors?.[selectedColor]?.name,
+      wheel: WHEELS.find((w) => w.id === selectedWheel)?.name,
+      interior: INTERIORS.find((i) => i.id === selectedInterior)?.name,
+      options: selectedOptions.map((id) => OPTIONS.find((o) => o.id === id)?.name),
+      estimatedTotal: total,
+      savedAt: new Date().toISOString(),
+    };
+    try {
+      localStorage.setItem('saved_supercar_config', JSON.stringify(configData));
+    } catch (_) {}
+    setSavedFeedback(true);
+    setTimeout(() => setSavedFeedback(false), 5000);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -246,8 +268,9 @@ export default function Configurator() {
                 filter: 'blur(8px)',
               }} />
               <img
-                src={car.image}
+                src={getImageUrl(car.image, car.slug)}
                 alt={car.name}
+                onError={(e) => handleImageError(e, car.slug)}
                 style={{
                   maxWidth: '90%',
                   maxHeight: '420px',
@@ -528,9 +551,35 @@ export default function Configurator() {
               >
                 Book a Test Drive
               </Link>
-              <button className="lambo-btn-outline" style={{ padding: '0.85rem' }}>
-                Save & Email Configuration
+              <button
+                type="button"
+                onClick={handleSaveConfiguration}
+                className="lambo-btn-outline"
+                style={{
+                  padding: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  borderColor: savedFeedback ? 'var(--lambo-gold)' : 'var(--lambo-border)',
+                  color: savedFeedback ? 'var(--lambo-gold)' : '#fff',
+                }}
+              >
+                {savedFeedback ? '✓ Configuration Saved!' : 'Save & Email Configuration'}
               </button>
+              {savedFeedback && (
+                <p style={{
+                  fontSize: '0.72rem',
+                  color: 'var(--lambo-gold)',
+                  textAlign: 'center',
+                  margin: '0.2rem 0 0',
+                  lineHeight: 1.4,
+                }}>
+                  {isAuthenticated
+                    ? `Build specification sent to ${user?.email || 'your email'}.`
+                    : 'Configuration copied! Sign in to save to your personal garage.'}
+                </p>
+              )}
               <Link
                 to="/dealers"
                 style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--lambo-text-gray)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '0.5rem' }}

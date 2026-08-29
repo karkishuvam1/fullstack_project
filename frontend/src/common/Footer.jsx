@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const MODELS = ['Revuelto', 'Urus', 'Temerario'];
+const MODELS = ['Revuelto', 'Urus', 'Temerario', 'Huracán'];
 const QUICK_LINKS = [
   { label: 'Book Test Drive', to: '/book-test-drive' },
   { label: 'Configurator', to: '/configurator' },
@@ -10,32 +10,12 @@ const QUICK_LINKS = [
 
 const SOCIALS = [
   {
-    label: 'Instagram',
-    href: 'https://instagram.com',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="2" y="2" width="20" height="20" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-  },
-  {
     label: 'YouTube',
-    href: 'https://youtube.com',
+    href: 'https://youtu.be/1E4CDn4B7wo?si=EjOXU_rKGMi-NBdF',
     icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <rect x="2" y="5" width="20" height="14" rx="4" />
         <path d="M10 9.5v5l5-2.5-5-2.5z" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-  },
-  {
-    label: 'X',
-    href: 'https://x.com',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M4 4l16 16M20 4L4 20" />
       </svg>
     ),
   },
@@ -54,7 +34,7 @@ const Footer = () => {
                 key={social.label}
                 href={social.href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label={social.label}
               >
                 {social.icon}
@@ -68,7 +48,7 @@ const Footer = () => {
           <ul>
             {MODELS.map((model) => (
               <li key={model}>
-                <Link to={`/cars/${model.toLowerCase()}`} className="footer-link" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link to={`/cars/${model.toLowerCase().replace(' ', '-')}`} className="footer-link" style={{ textDecoration: 'none', color: 'inherit' }}>
                   {model}
                 </Link>
               </li>

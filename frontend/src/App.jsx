@@ -15,6 +15,9 @@ import Dealers from "./pages/Dealers";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+// Admin Login (public - separate from client login)
+import AdminLogin from "./pages/admin/AdminLogin";
+
 // Client Protected Pages
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
@@ -45,9 +48,12 @@ function App() {
           <Route path="/configurator/:slug" element={<Configurator />} />
           <Route path="/dealers" element={<Dealers />} />
 
-          {/* Auth Routes */}
+          {/* Client Auth Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Admin Auth Route — separate portal, public-accessible to enter credentials */}
+          <Route path="/admin/login" element={<AdminLogin />} />
 
           {/* Client Authenticated Routes */}
           <Route
@@ -67,7 +73,7 @@ function App() {
             }
           />
 
-          {/* Admin Protected Routes */}
+          {/* Admin Protected Routes (redirect to /admin/login if not admin) */}
           <Route
             path="/admin"
             element={

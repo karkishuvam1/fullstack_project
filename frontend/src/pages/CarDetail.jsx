@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 import { getCarBySlug } from '../services/CarService';
+import { getImageUrl, handleImageError } from '../utils/imageUrl';
 import '../styles/Home.css';
 
 const fallbackCar = {
@@ -133,9 +134,10 @@ export default function CarDetail() {
       <main style={{ paddingTop: '80px' }}>
         <section style={{ position: 'relative', width: '100%', height: '70vh', minHeight: '480px', overflow: 'hidden' }}>
           <img
-            src={car.image}
+            src={getImageUrl(car.image, car.slug)}
             alt={`Lamborghini ${car.name}`}
             style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }}
+            onError={(e) => handleImageError(e, car.slug)}
           />
           <div style={{
             position: 'absolute',
@@ -315,8 +317,9 @@ export default function CarDetail() {
                   transition: 'background 0.4s ease',
                 }}>
                   <img
-                    src={car.image}
+                    src={getImageUrl(car.image, car.slug)}
                     alt={car.name}
+                    onError={(e) => handleImageError(e, car.slug)}
                     style={{
                       position: 'absolute',
                       inset: 0,

@@ -3,6 +3,7 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
+const { seedData } = require("./seedData");
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
@@ -18,7 +19,10 @@ const newsletterRoutes = require("./routes/newsletterRoutes");
 // Middleware
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
-connectDB();
+// Connect Database and auto-seed initial data
+connectDB().then(() => {
+  seedData(true);
+});
 
 const app = express();
 

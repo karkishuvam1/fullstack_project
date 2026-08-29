@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useOnScreen from '../common/useonScreen';
 import { getCars } from '../services/CarService';
+import { getImageUrl, handleImageError } from '../utils/imageUrl';
 
 const fallbackCars = [
   {
@@ -79,7 +80,13 @@ const CarCard = ({ car, onViewSpecs }) => {
       }}
     >
       <div className="car-card-img-wrapper">
-        <img src={car.image} alt={`Lamborghini ${car.name}`} loading="lazy" />
+        <img
+          src={getImageUrl(car.image, car.slug)}
+          alt={`Lamborghini ${car.name}`}
+          loading="lazy"
+          onError={(e) => handleImageError(e, car.slug)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
       </div>
       <div className="car-card-content">
         <h3 className="car-card-title">{car.name}</h3>
@@ -111,7 +118,12 @@ const SpecModal = ({ car, onClose }) => {
         aria-label={`${car.name} specifications`}
         onClick={(e) => e.stopPropagation()}
       >
-        <img src={car.image} alt={`Lamborghini ${car.name}`} className="lambo-modal-img" />
+        <img
+          src={getImageUrl(car.image, car.slug)}
+          alt={`Lamborghini ${car.name}`}
+          className="lambo-modal-img"
+          onError={(e) => handleImageError(e, car.slug)}
+        />
         <div className="lambo-modal-body">
           <button type="button" className="lambo-modal-close" onClick={onClose} aria-label="Close">
             &times;

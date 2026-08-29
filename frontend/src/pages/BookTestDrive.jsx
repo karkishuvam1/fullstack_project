@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 import { getCars } from '../services/CarService';
 import { bookTestDrive } from '../services/TestDriveService';
 import { useAuth } from '../context/AuthContext';
+import { getImageUrl, handleImageError } from '../utils/imageUrl';
 import '../styles/Home.css';
 
 const fallbackCars = [
-  { _id: 'revuelto', name: 'Revuelto', slug: 'revuelto', image: 'https://images.unsplash.com/photo-1620223741726-7d39ff6e4e6c?auto=format&fit=crop&w=800&q=80' },
-  { _id: 'urus-se', name: 'Urus SE', slug: 'urus-se', image: 'https://images.unsplash.com/photo-1575650681837-c0ca3b1e7275?auto=format&fit=crop&w=800&q=80' },
-  { _id: 'temerario', name: 'Temerario', slug: 'temerario', image: 'https://images.unsplash.com/photo-1776690061399-d2e7f7e88751?auto=format&fit=crop&w=800&q=80' },
+  { _id: 'revuelto', name: 'Revuelto', slug: 'revuelto', image: '/uploads/revuelto.jpg' },
+  { _id: 'urus-se', name: 'Urus SE', slug: 'urus-se', image: '/uploads/urus-se.jpg' },
+  { _id: 'temerario', name: 'Temerario', slug: 'temerario', image: '/uploads/temerario.jpg' },
+  { _id: 'huracan-tecnica', name: 'Huracán Tecnica', slug: 'huracan-tecnica', image: '/uploads/huracan-tecnica.jpg' },
+  { _id: 'sian-fkp-37', name: 'Sián FKP 37', slug: 'sian-fkp-37', image: '/uploads/sian-fkp37.jpg' },
+  { _id: 'countach-lpi-800-4', name: 'Countach LPI 800-4', slug: 'countach-lpi-800-4', image: '/uploads/countach-lpi800.jpg' },
+  { _id: 'aventador-svj', name: 'Aventador SVJ', slug: 'aventador-svj', image: '/uploads/aventador-svj.jpg' },
 ];
 
 const DEALERS = [
@@ -52,6 +57,18 @@ export default function BookTestDrive() {
   const [loading, setLoading] = useState(false);
   const [carsLoading, setCarsLoading] = useState(true);
 
+  // Sync user info if user logs in
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+      }));
+    }
+  }, [user]);
+
   useEffect(() => {
     let mounted = true;
     async function fetchCars() {
@@ -61,23 +78,23 @@ export default function BookTestDrive() {
         if (mounted) {
           setCars(list);
           if (slug) {
-            const matched = list.find((c) => c.slug === slug);
+            const matched = list.find((c) => c.slug === slug || c.name.toLowerCase() === slug.toLowerCase());
             if (matched) {
-              setFormData((prev) => ({ ...prev, car: matched._id }));
+              setFormData((prev) => ({ ...prev, car: matched._id || matched.slug }));
             } else if (list.length > 0) {
-              setFormData((prev) => ({ ...prev, car: prev.car || list[0]._id }));
+              setFormData((prev) => ({ ...prev, car: prev.car || list[0]._id || list[0].slug }));
             }
           } else if (list.length > 0) {
-            setFormData((prev) => ({ ...prev, car: prev.car || list[0]._id }));
+            setFormData((prev) => ({ ...prev, car: prev.car || list[0]._id || list[0].slug }));
           }
         }
       } catch (error) {
         if (mounted) {
           setCars(fallbackCars);
           if (slug) {
-            const matched = fallbackCars.find((c) => c.slug === slug);
+            const matched = fallbackCars.find((c) => c.slug === slug || c.name.toLowerCase() === slug.toLowerCase());
             if (matched) {
-              setFormData((prev) => ({ ...prev, car: matched._id }));
+              setFormData((prev) => ({ ...prev, car: matched._id || matched.slug }));
             } else {
               setFormData((prev) => ({ ...prev, car: prev.car || fallbackCars[0]._id }));
             }
@@ -91,7 +108,7 @@ export default function BookTestDrive() {
     }
     fetchCars();
     return () => { mounted = false; };
-  }, [slug, user]);
+  }, [slug]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,6 +120,12 @@ export default function BookTestDrive() {
     e.preventDefault();
     setError('');
     setSuccess(false);
+
+    if (!isAuthenticated) {
+      setError('You must be signed in as a client to book a test drive.');
+      navigate('/login');
+      return;
+    }
 
     const { car, name, email, phone, preferredDate, preferredTime, dealer } = formData;
     if (!car || !name || !email || !phone || !preferredDate || !preferredTime || !dealer) {
@@ -118,7 +141,7 @@ export default function BookTestDrive() {
 
     setLoading(true);
     try {
-      await bookTestDrive(formData, isAuthenticated);
+      await bookTestDrive(formData, true);
       setSuccess(true);
       setFormData({
         car: formData.car,
@@ -138,7 +161,13 @@ export default function BookTestDrive() {
     }
   };
 
-  const selectedCar = cars.find((c) => c._id === formData.car) || cars[0] || fallbackCars[0];
+  // Find selected car dynamically by _id, slug, or name
+  const carList = cars.length > 0 ? cars : fallbackCars;
+  const selectedCar =
+    carList.find((c) => (c._id && c._id === formData.car) || (c.slug && c.slug === formData.car) || (c.name && c.name === formData.car)) ||
+    carList[0] ||
+    fallbackCars[0];
+
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
   const minDateStr = minDate.toISOString().split('T')[0];
@@ -228,10 +257,10 @@ export default function BookTestDrive() {
                   Book Another
                 </button>
                 <button
-                  onClick={() => navigate('/home')}
+                  onClick={() => navigate('/dashboard')}
                   className="lambo-btn-gold lambo-cut"
                 >
-                  Back to Home
+                  View My Bookings
                 </button>
               </div>
             </div>
@@ -252,11 +281,15 @@ export default function BookTestDrive() {
                     position: 'sticky',
                     top: '100px',
                   }}>
-                    <img
-                      src={selectedCar.image}
-                      alt={selectedCar.name}
-                      style={{ width: '100%', height: '220px', objectFit: 'cover' }}
-                    />
+                    <div style={{ width: '100%', height: '240px', background: '#050505', overflow: 'hidden' }}>
+                      <img
+                        key={selectedCar.slug || selectedCar._id}
+                        src={getImageUrl(selectedCar.image, selectedCar.slug)}
+                        alt={selectedCar.name}
+                        onError={(e) => handleImageError(e, selectedCar.slug)}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
                     <div style={{ padding: '1.5rem' }}>
                       <p style={{
                         fontSize: '0.65rem',
@@ -298,6 +331,41 @@ export default function BookTestDrive() {
                 padding: '2.5rem',
                 clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%)',
               }}>
+                {/* Client Login Notice for Guests */}
+                {!isAuthenticated && (
+                  <div style={{
+                    padding: '1.25rem',
+                    marginBottom: '1.75rem',
+                    background: 'rgba(229, 184, 0, 0.08)',
+                    border: '1px solid rgba(229, 184, 0, 0.35)',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                  }}>
+                    <p style={{
+                      color: 'var(--lambo-gold)',
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '0.75rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.12em',
+                      margin: '0 0 0.4rem',
+                      fontWeight: 700,
+                    }}>
+                      🔒 Client Login Required
+                    </p>
+                    <p style={{ color: '#ccc', fontSize: '0.8rem', margin: '0 0 1rem', lineHeight: 1.45 }}>
+                      Private test drive appointments are reserved for registered clients. Please sign in or create an account to submit your request.
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+                      <Link to="/login" className="lambo-btn-gold lambo-cut" style={{ fontSize: '0.72rem', padding: '0.5rem 1.25rem', textDecoration: 'none' }}>
+                        Sign In
+                      </Link>
+                      <Link to="/register" className="lambo-btn-outline" style={{ fontSize: '0.72rem', padding: '0.5rem 1.25rem', textDecoration: 'none' }}>
+                        Register Account
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
                 {error && (
                   <div style={{
                     padding: '0.85rem 1rem',
@@ -321,8 +389,8 @@ export default function BookTestDrive() {
                     style={selectStyle}
                   >
                     <option value="">— Choose a model —</option>
-                    {cars.map((c) => (
-                      <option key={c._id} value={c._id}>{c.name}</option>
+                    {carList.map((c) => (
+                      <option key={c._id || c.slug} value={c._id || c.slug}>{c.name}</option>
                     ))}
                   </select>
                 </div>
@@ -419,14 +487,32 @@ export default function BookTestDrive() {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading || carsLoading}
-                  className="lambo-btn-gold lambo-cut"
-                  style={{ width: '100%', padding: '1rem', fontSize: '0.85rem' }}
-                >
-                  {loading ? 'Submitting Request...' : 'Confirm Test Drive Request'}
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    type="submit"
+                    disabled={loading || carsLoading}
+                    className="lambo-btn-gold lambo-cut"
+                    style={{ width: '100%', padding: '1rem', fontSize: '0.85rem' }}
+                  >
+                    {loading ? 'Submitting Request...' : 'Confirm Test Drive Request'}
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="lambo-btn-gold lambo-cut"
+                    style={{
+                      width: '100%',
+                      padding: '1rem',
+                      fontSize: '0.85rem',
+                      textAlign: 'center',
+                      display: 'block',
+                      textDecoration: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    Sign In as Client to Book Test Drive
+                  </Link>
+                )}
               </form>
             </div>
           )}

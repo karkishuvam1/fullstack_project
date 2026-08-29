@@ -73,7 +73,14 @@ async function bookTestDrive(req, res) {
       });
     }
 
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Authentication required. Please sign in to your client account to book a test drive.",
+      });
+    }
+
     const bookingData = {
+      user: req.user._id,
       car: carDoc._id,
       name: name.trim(),
       email: email.trim().toLowerCase(),
@@ -83,10 +90,6 @@ async function bookTestDrive(req, res) {
       dealer,
       message: message ? message.trim() : "",
     };
-
-    if (req.user) {
-      bookingData.user = req.user._id;
-    }
 
     const testDrive = await TestDrive.create(bookingData);
 

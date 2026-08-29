@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 import { getCars } from '../services/CarService';
+import { getImageUrl, handleImageError } from '../utils/imageUrl';
 import '../styles/Home.css';
 
 const fallbackCars = [
@@ -224,8 +225,9 @@ export default function Compare() {
                           }}>
                             <Link to={`/cars/${car.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                               <img
-                                src={car.image}
+                                src={getImageUrl(car.image, car.slug)}
                                 alt={car.name}
+                                onError={(e) => handleImageError(e, car.slug)}
                                 style={{
                                   width: '100%',
                                   height: '130px',
