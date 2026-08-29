@@ -318,7 +318,6 @@ async function seedData() {
   }
 }
 
-// Only execute directly when run via node seedData.js
 if (require.main === module) {
   seedData();
 }

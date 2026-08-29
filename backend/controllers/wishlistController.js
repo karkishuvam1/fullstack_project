@@ -33,10 +33,17 @@ async function addToWishlist(req, res) {
       return res.status(400).json({ message: "Car ID is required" });
     }
 
-    const car = await Car.findById(carId);
+    let car = null;
+    if (mongoose.Types.ObjectId.isValid(carId)) {
+      car = await Car.findById(carId);
+    }
+    if (!car) {
+      car = await Car.findOne({ slug: String(carId).toLowerCase() });
+    }
     if (!car) {
       return res.status(404).json({ message: "Car not found" });
     }
+    const resolvedCarId = car._id;
 
     let wishlist = await Wishlist.findOne({ user: req.user._id });
 
@@ -45,14 +52,14 @@ async function addToWishlist(req, res) {
     }
 
     const alreadyInWishlist = wishlist.cars.some(
-      (item) => item.car.toString() === carId.toString()
+      (item) => item.car.toString() === resolvedCarId.toString()
     );
 
     if (alreadyInWishlist) {
       return res.status(400).json({ message: "Car is already in your wishlist" });
     }
 
-    wishlist.cars.unshift({ car: carId, addedAt: new Date() });
+    wishlist.cars.unshift({ car: resolvedCarId, addedAt: new Date() });
     await wishlist.save();
 
     const populatedWishlist = await Wishlist.findById(wishlist._id).populate(

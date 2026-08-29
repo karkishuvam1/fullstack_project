@@ -1,16 +1,17 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useOnScreen from '../common/useonScreen';
+import { getCars } from '../services/CarService';
 
-// All photos below are real cars sourced free-to-use under the Unsplash
-// License — swap for official Lamborghini press-kit assets in production.
-const cars = [
+const fallbackCars = [
   {
-    id: '1',
+    _id: '1',
     name: 'Revuelto',
+    slug: 'revuelto',
     power: '1015 CV',
     engine: 'V12 Hybrid',
     topSpeed: '> 350 km/h',
-    zeroToSixty: '2.5 s',
+    zeroToHundred: '2.5 s',
     weight: '1,772 kg',
     image:
       'https://images.unsplash.com/photo-1620223741726-7d39ff6e4e6c?auto=format&fit=crop&w=1200&q=80',
@@ -18,12 +19,13 @@ const cars = [
       'The first V12 hybrid super sports car — three electric motors and a naturally-aspirated heart working as one.',
   },
   {
-    id: '2',
+    _id: '2',
     name: 'Urus SE',
+    slug: 'urus-se',
     power: '800 CV',
     engine: 'V8 Twin-Turbo Hybrid',
     topSpeed: '312 km/h',
-    zeroToSixty: '3.4 s',
+    zeroToHundred: '3.4 s',
     weight: '2,150 kg',
     image:
       'https://images.unsplash.com/photo-1575650681837-c0ca3b1e7275?auto=format&fit=crop&w=1200&q=80',
@@ -31,12 +33,13 @@ const cars = [
       "The world's first Super SUV, now plug-in hybrid — everyday usability with a super sports car soul.",
   },
   {
-    id: '3',
+    _id: '3',
     name: 'Temerario',
+    slug: 'temerario',
     power: '920 CV',
     engine: 'V8 Hybrid',
     topSpeed: '343 km/h',
-    zeroToSixty: '2.7 s',
+    zeroToHundred: '2.7 s',
     weight: '1,690 kg',
     image:
       'https://images.unsplash.com/photo-1776690061399-d2e7f7e88751?auto=format&fit=crop&w=1200&q=80',
@@ -81,7 +84,7 @@ const CarCard = ({ car, onViewSpecs }) => {
       <div className="car-card-content">
         <h3 className="car-card-title">{car.name}</h3>
         <p className="car-card-specs">
-          {car.engine} • {car.power}
+          {car.engine} • {car.power} • 0-100: {car.zeroToHundred || car.zeroToSixty || '-- s'}
         </p>
         <button
           type="button"
@@ -97,6 +100,7 @@ const CarCard = ({ car, onViewSpecs }) => {
 };
 
 const SpecModal = ({ car, onClose }) => {
+  const navigate = useNavigate();
   if (!car) return null;
   return (
     <div className="lambo-modal-backdrop" onClick={onClose}>
@@ -131,16 +135,37 @@ const SpecModal = ({ car, onClose }) => {
             </div>
             <div className="spec-item">
               <p className="spec-label">0-100 km/h</p>
-              <p className="spec-value" style={{ fontSize: '1.1rem' }}>{car.zeroToSixty}</p>
+              <p className="spec-value" style={{ fontSize: '1.1rem' }}>{car.zeroToHundred}</p>
             </div>
             <div className="spec-item">
               <p className="spec-label">Dry Weight</p>
               <p className="spec-value" style={{ fontSize: '1.1rem' }}>{car.weight}</p>
             </div>
           </div>
-          <button type="button" className="lambo-btn-gold lambo-cut" style={{ width: '100%' }}>
-            Configure {car.name}
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+            <button
+              type="button"
+              className="lambo-btn-outline"
+              style={{ flex: 1 }}
+              onClick={() => {
+                onClose();
+                navigate(`/cars/${car.slug}`);
+              }}
+            >
+              Full Details
+            </button>
+            <button
+              type="button"
+              className="lambo-btn-gold lambo-cut"
+              style={{ flex: 1 }}
+              onClick={() => {
+                onClose();
+                navigate(`/configurator/${car.slug}`);
+              }}
+            >
+              Configure
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -150,17 +175,51 @@ const SpecModal = ({ car, onClose }) => {
 const FeaturedCars = () => {
   const [activeCar, setActiveCar] = useState(null);
   const [headerRef, headerVisible] = useOnScreen();
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchCars() {
+      try {
+        const data = await getCars();
+        if (mounted && data && data.length > 0) {
+          setCars(data);
+        } else if (mounted) {
+          setCars(fallbackCars);
+        }
+      } catch (error) {
+        if (mounted) setCars(fallbackCars);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    fetchCars();
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <section className="lambo-featured-section">
       <h2 className={`section-title reveal${headerVisible ? ' is-visible' : ''}`} ref={headerRef}>
         Models
       </h2>
-      <div className="lambo-car-grid">
-        {cars.map((car) => (
-          <CarCard key={car.id} car={car} onViewSpecs={setActiveCar} />
-        ))}
-      </div>
+      {loading ? (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '4rem',
+          color: 'var(--lambo-gold)',
+          fontFamily: 'var(--font-display)',
+        }}>
+          Loading models...
+        </div>
+      ) : (
+        <div className="lambo-car-grid">
+          {cars.map((car) => (
+            <CarCard key={car._id} car={car} onViewSpecs={setActiveCar} />
+          ))}
+        </div>
+      )}
 
       <SpecModal car={activeCar} onClose={() => setActiveCar(null)} />
     </section>

@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {
-  res.send("Aurelia Motorworks API is running...");
+  res.send("Aurelia / Lamborghini Supercars API is running...");
 });
 
 // Mount Routes
@@ -42,12 +42,12 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Test Drive routes (supporting frontend /api/testdrive and /api/test-drives)
+// Test Drive routes (supports /api/testdrive, /api/test-drives, /api/testdrives)
 app.use("/api/test-drives", testDriveRoutes);
 app.use("/api/testdrive", testDriveRoutes);
 app.use("/api/testdrives", testDriveRoutes);
 
-// Newsletter routes
+// Newsletter routes (supports /api/newsletter and /api/newsletters)
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/newsletters", newsletterRoutes);
 

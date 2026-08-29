@@ -8,9 +8,9 @@ import { useAuth } from '../context/AuthContext';
 import '../styles/Home.css';
 
 const fallbackCars = [
-  { _id: '1', name: 'Revuelto', slug: 'revuelto', image: 'https://images.unsplash.com/photo-1620223741726-7d39ff6e4e6c?auto=format&fit=crop&w=800&q=80' },
-  { _id: '2', name: 'Urus SE', slug: 'urus-se', image: 'https://images.unsplash.com/photo-1575650681837-c0ca3b1e7275?auto=format&fit=crop&w=800&q=80' },
-  { _id: '3', name: 'Temerario', slug: 'temerario', image: 'https://images.unsplash.com/photo-1776690061399-d2e7f7e88751?auto=format&fit=crop&w=800&q=80' },
+  { _id: 'revuelto', name: 'Revuelto', slug: 'revuelto', image: 'https://images.unsplash.com/photo-1620223741726-7d39ff6e4e6c?auto=format&fit=crop&w=800&q=80' },
+  { _id: 'urus-se', name: 'Urus SE', slug: 'urus-se', image: 'https://images.unsplash.com/photo-1575650681837-c0ca3b1e7275?auto=format&fit=crop&w=800&q=80' },
+  { _id: 'temerario', name: 'Temerario', slug: 'temerario', image: 'https://images.unsplash.com/photo-1776690061399-d2e7f7e88751?auto=format&fit=crop&w=800&q=80' },
 ];
 
 const DEALERS = [
@@ -41,7 +41,7 @@ export default function BookTestDrive() {
     car: '',
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
+    phone: user?.phone || '',
     preferredDate: '',
     preferredTime: '',
     dealer: DEALERS[0],
@@ -57,14 +57,18 @@ export default function BookTestDrive() {
     async function fetchCars() {
       try {
         const data = await getCars();
-        const list = data.length > 0 ? data : fallbackCars;
+        const list = Array.isArray(data) && data.length > 0 ? data : fallbackCars;
         if (mounted) {
           setCars(list);
           if (slug) {
             const matched = list.find((c) => c.slug === slug);
             if (matched) {
               setFormData((prev) => ({ ...prev, car: matched._id }));
+            } else if (list.length > 0) {
+              setFormData((prev) => ({ ...prev, car: prev.car || list[0]._id }));
             }
+          } else if (list.length > 0) {
+            setFormData((prev) => ({ ...prev, car: prev.car || list[0]._id }));
           }
         }
       } catch (error) {
@@ -74,7 +78,11 @@ export default function BookTestDrive() {
             const matched = fallbackCars.find((c) => c.slug === slug);
             if (matched) {
               setFormData((prev) => ({ ...prev, car: matched._id }));
+            } else {
+              setFormData((prev) => ({ ...prev, car: prev.car || fallbackCars[0]._id }));
             }
+          } else {
+            setFormData((prev) => ({ ...prev, car: prev.car || fallbackCars[0]._id }));
           }
         }
       } finally {
@@ -116,7 +124,7 @@ export default function BookTestDrive() {
         car: formData.car,
         name: user?.name || '',
         email: user?.email || '',
-        phone: '',
+        phone: user?.phone || '',
         preferredDate: '',
         preferredTime: '',
         dealer: DEALERS[0],
@@ -130,7 +138,7 @@ export default function BookTestDrive() {
     }
   };
 
-  const selectedCar = cars.find((c) => c._id === formData.car);
+  const selectedCar = cars.find((c) => c._id === formData.car) || cars[0] || fallbackCars[0];
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
   const minDateStr = minDate.toISOString().split('T')[0];
@@ -235,7 +243,7 @@ export default function BookTestDrive() {
               alignItems: 'start',
             }}>
               <div>
-                {selectedCar ? (
+                {selectedCar && (
                   <div style={{
                     background: 'var(--lambo-card-bg)',
                     border: '1px solid var(--lambo-border)',
@@ -280,19 +288,6 @@ export default function BookTestDrive() {
                         about vehicle dynamics, customization options, and ownership experience.
                       </p>
                     </div>
-                  </div>
-                ) : (
-                  <div style={{
-                    padding: '3rem 2rem',
-                    background: 'var(--lambo-card-bg)',
-                    border: '1px dashed var(--lambo-border)',
-                    textAlign: 'center',
-                    position: 'sticky',
-                    top: '100px',
-                  }}>
-                    <p style={{ color: 'var(--lambo-text-gray)', fontFamily: 'var(--font-display)', textTransform: 'uppercase', fontSize: '0.8rem' }}>
-                      Select a model from the form to view details
-                    </p>
                   </div>
                 )}
               </div>
@@ -351,7 +346,7 @@ export default function BookTestDrive() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="you@example.com"
+                      placeholder="alex@example.com"
                       style={inputStyle}
                     />
                   </div>
@@ -364,7 +359,7 @@ export default function BookTestDrive() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+1 555 123 4567"
+                    placeholder="+1 (555) 000-0000"
                     style={inputStyle}
                   />
                 </div>
@@ -383,19 +378,19 @@ export default function BookTestDrive() {
                   </select>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div>
                     <label style={labelStyle}>Preferred Date *</label>
                     <input
                       type="date"
                       name="preferredDate"
+                      min={minDateStr}
                       value={formData.preferredDate}
                       onChange={handleChange}
-                      min={minDateStr}
-                      style={{ ...inputStyle, textTransform: 'uppercase', fontSize: '0.78rem' }}
+                      style={{ ...inputStyle, colorScheme: 'dark' }}
                     />
                   </div>
-                  <div style={{ marginBottom: '1.5rem' }}>
+                  <div>
                     <label style={labelStyle}>Preferred Time *</label>
                     <select
                       name="preferredTime"
@@ -403,7 +398,7 @@ export default function BookTestDrive() {
                       onChange={handleChange}
                       style={selectStyle}
                     >
-                      <option value="">— Select time —</option>
+                      <option value="">Select time</option>
                       {TIME_SLOTS.map((t) => (
                         <option key={t} value={t}>{t}</option>
                       ))}
@@ -412,47 +407,25 @@ export default function BookTestDrive() {
                 </div>
 
                 <div style={{ marginBottom: '2rem' }}>
-                  <label style={labelStyle}>Additional Notes <span style={{ color: 'var(--lambo-text-gray)', fontWeight: 400 }}>(optional, max 500 chars)</span></label>
+                  <label style={labelStyle}>Additional Notes (Optional, max 500 chars)</label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Tell us about any specific features or questions you'd like to explore during your visit..."
-                    rows={4}
                     maxLength={500}
-                    style={{ ...inputStyle, resize: 'vertical', paddingTop: '0.8rem' }}
+                    rows={3}
+                    placeholder="Specific requests, current vehicle, or areas of interest..."
+                    style={{ ...inputStyle, resize: 'vertical' }}
                   />
                 </div>
-
-                {!isAuthenticated && (
-                  <div style={{
-                    padding: '0.85rem 1rem',
-                    background: 'rgba(229, 184, 0, 0.06)',
-                    border: '1px solid rgba(229, 184, 0, 0.2)',
-                    fontSize: '0.75rem',
-                    color: 'var(--lambo-text-gray)',
-                    marginBottom: '1.5rem',
-                    lineHeight: 1.5,
-                  }}>
-                    💡 <strong style={{ color: 'var(--lambo-gold)' }}>Tip:</strong> Creating an account lets you
-                    save favorite models, view your booking history, and speed up future requests.
-                  </div>
-                )}
 
                 <button
                   type="submit"
                   disabled={loading || carsLoading}
                   className="lambo-btn-gold lambo-cut"
-                  style={{ width: '100%', padding: '1rem' }}
+                  style={{ width: '100%', padding: '1rem', fontSize: '0.85rem' }}
                 >
-                  {loading ? (
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                      <span className="aur-spinner" aria-hidden="true" style={{ width: '14px', height: '14px', border: '2px solid rgba(20, 17, 12, 0.35)', borderTopColor: '#14110c', borderRadius: '50%', animation: 'aur-spin 0.7s linear infinite' }} />
-                      Submitting Request…
-                    </span>
-                  ) : (
-                    'Request Test Drive'
-                  )}
+                  {loading ? 'Submitting Request...' : 'Confirm Test Drive Request'}
                 </button>
               </form>
             </div>
@@ -467,34 +440,29 @@ export default function BookTestDrive() {
 
 const labelStyle = {
   display: 'block',
-  fontFamily: "'Space Mono', monospace",
-  fontSize: '0.65rem',
-  letterSpacing: '0.13em',
+  fontSize: '0.68rem',
   textTransform: 'uppercase',
-  color: '#a1a1a1',
+  letterSpacing: '0.12em',
+  color: 'var(--lambo-gold)',
+  fontFamily: 'var(--font-display)',
   marginBottom: '0.5rem',
+  fontWeight: 600,
 };
 
 const inputStyle = {
   width: '100%',
-  background: '#000000',
-  border: '1px solid #222222',
-  padding: '0.8rem 0.9rem',
-  color: '#ffffff',
-  fontFamily: "'Montserrat', sans-serif",
-  fontSize: '0.92rem',
+  padding: '0.85rem 1rem',
+  background: '#050505',
+  border: '1px solid var(--lambo-border)',
+  color: '#fff',
+  fontFamily: 'inherit',
+  fontSize: '0.85rem',
   outline: 'none',
-  transition: 'border-color 0.2s ease',
+  transition: 'border-color 0.2s',
   boxSizing: 'border-box',
 };
 
 const selectStyle = {
   ...inputStyle,
-  appearance: 'none',
   cursor: 'pointer',
-  background: '#000000',
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23e5b800' d='M6 8L0 0h12z'/%3E%3C/svg%3E")`,
-  backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'right 0.9rem center',
-  paddingRight: '2.5rem',
 };

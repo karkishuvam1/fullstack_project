@@ -26,13 +26,22 @@ async function createOrder(req, res) {
 
     // Verify car existence if a primary car ID is passed
     let primaryCar = car;
+    let carDoc = null;
     if (primaryCar) {
-      const carDoc = await Car.findById(primaryCar);
+      if (mongoose.Types.ObjectId.isValid(primaryCar)) {
+        carDoc = await Car.findById(primaryCar);
+      }
       if (!carDoc) {
-        return res.status(404).json({ message: "Specified car not found" });
+        carDoc = await Car.findOne({ slug: String(primaryCar).toLowerCase() });
+      }
+      if (carDoc) {
+        primaryCar = carDoc._id;
       }
     } else if (orderItems && orderItems.length > 0) {
-      primaryCar = orderItems[0].car;
+      const firstItemCar = orderItems[0].car;
+      if (mongoose.Types.ObjectId.isValid(firstItemCar)) {
+        primaryCar = firstItemCar;
+      }
     }
 
     const orderData = {

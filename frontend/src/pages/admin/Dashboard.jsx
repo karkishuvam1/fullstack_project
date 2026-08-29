@@ -1,23 +1,38 @@
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import AdminLayout from "../../components/layout/AdminLayout";
+import { getDashboardStats } from "../../services/AdminService";
 import "../../styles/theme.css";
 
-// TODO: replace with real data fetched from your backend
-// (e.g. GET /api/admin/stats, GET /api/orders?limit=5)
-const stats = [
-  { label: "Total Cars", value: "48", tone: "" },
-  { label: "Active Listings", value: "36", tone: "green" },
-  { label: "Total Orders", value: "112", tone: "" },
-  { label: "Revenue (MTD)", value: "$482,000", tone: "brass" },
-];
-
-const recentOrders = [
-  { id: "ORD-1042", customer: "Alex Whitfield", car: "2024 Bentley Continental GT", status: "Completed", amount: "$228,500" },
-  { id: "ORD-1041", customer: "Priya Nair", car: "2023 Porsche 911 Turbo S", status: "Pending", amount: "$198,000" },
-  { id: "ORD-1040", customer: "Marcus Chen", car: "2022 Aston Martin DB11", status: "Completed", amount: "$214,900" },
-  { id: "ORD-1039", customer: "Sofia Reyes", car: "2024 Range Rover Autobiography", status: "Cancelled", amount: "$142,300" },
-];
-
 export default function Dashboard() {
+  const [stats, setStats] = useState([
+    { label: "Total Cars", value: "...", tone: "" },
+    { label: "Active Listings", value: "...", tone: "green" },
+    { label: "Total Orders", value: "...", tone: "" },
+    { label: "Revenue (MTD)", value: "...", tone: "brass" },
+  ]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const data = await getDashboardStats();
+        if (data && data.stats) {
+          setStats(data.stats);
+        }
+        if (data && data.recentOrders) {
+          setRecentOrders(data.recentOrders);
+        }
+      } catch (error) {
+        console.error("Failed to load admin stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStats();
+  }, []);
+
   return (
     <AdminLayout title="Dashboard" subtitle="Overview of inventory, orders, and revenue">
       <div className="ap-stat-grid">
@@ -30,44 +45,54 @@ export default function Dashboard() {
       </div>
 
       <div className="ap-card">
-        <p className="ap-card-title">Recent Orders</p>
-
-        <div className="ap-table-wrap">
-          <table className="ap-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Vehicle</th>
-                <th>Status</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((order) => (
-                <tr key={order.id}>
-                  <td className="ap-cell-mono">{order.id}</td>
-                  <td>{order.customer}</td>
-                  <td className="ap-cell-muted">{order.car}</td>
-                  <td>
-                    <StatusBadge status={order.status} />
-                  </td>
-                  <td>{order.amount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <p className="ap-card-title" style={{ margin: 0 }}>Recent Orders</p>
+          <Link to="/admin/orders" style={{ fontSize: "0.8rem", color: "var(--accent)", textDecoration: "none" }}>
+            View All Orders →
+          </Link>
         </div>
+
+        {loading ? (
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Loading dashboard...</p>
+        ) : recentOrders.length === 0 ? (
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No orders placed yet.</p>
+        ) : (
+          <div className="ap-table-wrap">
+            <table className="ap-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Vehicle</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentOrders.map((order) => (
+                  <tr key={order._id || order.id || order.orderId}>
+                    <td className="ap-td-mono">{order.orderId || order._id?.substring(0, 8)}</td>
+                    <td>{order.customer?.name || order.user?.name || "Client"}</td>
+                    <td>{order.car?.name || order.orderItems?.[0]?.name || "Supercar"}</td>
+                    <td>
+                      <span className={`ap-badge ap-badge-${(order.status || "pending").toLowerCase()}`}>
+                        {order.status || "Pending"}
+                      </span>
+                    </td>
+                    <td className="ap-td-bold">
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "EUR",
+                        maximumFractionDigits: 0,
+                      }).format(order.totalAmount || 0)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
-}
-
-function StatusBadge({ status }) {
-  const toneByStatus = {
-    Completed: "ap-badge-green",
-    Pending: "ap-badge-brass",
-    Cancelled: "ap-badge-danger",
-  };
-  return <span className={`ap-badge ${toneByStatus[status] || "ap-badge-muted"}`}>{status}</span>;
 }

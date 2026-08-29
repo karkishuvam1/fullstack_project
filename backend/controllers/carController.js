@@ -13,7 +13,7 @@ async function getCars(req, res) {
       filter.isActive = true;
     }
 
-    if (category) {
+    if (category && category !== "All") {
       filter.category = category;
     }
 
@@ -57,7 +57,7 @@ async function getCars(req, res) {
 // @access  Public
 async function getCarBySlug(req, res) {
   try {
-    const car = await Car.findOne({ slug: req.params.slug, isActive: true });
+    const car = await Car.findOne({ slug: req.params.slug });
 
     if (!car) {
       return res.status(404).json({ message: "Car not found" });
@@ -147,14 +147,15 @@ async function createCar(req, res) {
       return res.status(400).json({ message: "Please fill in all required fields" });
     }
 
-    const existingCar = await Car.findOne({ slug: slug.toLowerCase() });
+    const cleanSlug = slug.toLowerCase().trim();
+    const existingCar = await Car.findOne({ slug: cleanSlug });
     if (existingCar) {
       return res.status(400).json({ message: "A car with this slug already exists" });
     }
 
     const car = await Car.create({
-      name,
-      slug: slug.toLowerCase(),
+      name: name.trim(),
+      slug: cleanSlug,
       category,
       year: year || new Date().getFullYear(),
       power,
@@ -165,7 +166,7 @@ async function createCar(req, res) {
       transmission: transmission || "Automatic",
       drivetrain: drivetrain || "AWD",
       image,
-      gallery: gallery || [],
+      gallery: gallery || [image],
       blurb,
       description,
       startingPrice: Number(startingPrice),
@@ -192,6 +193,10 @@ async function updateCar(req, res) {
 
     if (!car) {
       return res.status(404).json({ message: "Car not found" });
+    }
+
+    if (req.body.slug) {
+      req.body.slug = req.body.slug.toLowerCase().trim();
     }
 
     const updatedCar = await Car.findByIdAndUpdate(

@@ -1,13 +1,28 @@
 import api from "./Api";
 
-export async function getCars(category) {
-  const params = category ? { params: { category } } : {};
-  const response = await api.get("/cars", params);
+export async function getCars(category, options = {}) {
+  const params = {};
+  if (category && category !== "All") params.category = category;
+  if (options.search) params.search = options.search;
+  if (options.sort) params.sort = options.sort;
+  if (options.includeInactive) params.includeInactive = options.includeInactive;
+
+  const response = await api.get("/cars", { params });
+  return response.data;
+}
+
+export async function getFeaturedCars() {
+  const response = await api.get("/cars/featured");
   return response.data;
 }
 
 export async function getCarBySlug(slug) {
   const response = await api.get(`/cars/${slug}`);
+  return response.data;
+}
+
+export async function getCarById(id) {
+  const response = await api.get(`/cars/id/${id}`);
   return response.data;
 }
 

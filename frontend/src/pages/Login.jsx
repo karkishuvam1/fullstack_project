@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
 import EyeIcon from "../components/auth/EyeIcon";
 import { loginUser } from "../services/Authservice";
+import { useAuth } from "../context/AuthContext";
 import "../styles/auth.css";
 
 export default function Login() {
-  // One state variable per field keeps things easy to read and debug.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +14,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -35,6 +36,8 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
  
+
+      login(data);
       navigate("/home");
     } catch (err){
       const message = err.response?.data?.message || "Could not sign in. Please try again.";

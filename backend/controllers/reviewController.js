@@ -30,20 +30,27 @@ async function createReview(req, res) {
       return res.status(400).json({ message: "Please provide car, rating, and comment" });
     }
 
-    const carExists = await Car.findById(car);
-    if (!carExists) {
+    let carDoc = null;
+    if (mongoose.Types.ObjectId.isValid(car)) {
+      carDoc = await Car.findById(car);
+    }
+    if (!carDoc) {
+      carDoc = await Car.findOne({ slug: String(car).toLowerCase() });
+    }
+    if (!carDoc) {
       return res.status(404).json({ message: "Car not found" });
     }
+    const resolvedCarId = carDoc._id;
 
     // Check if user already reviewed this car
-    const alreadyReviewed = await Review.findOne({ car, user: req.user._id });
+    const alreadyReviewed = await Review.findOne({ car: resolvedCarId, user: req.user._id });
     if (alreadyReviewed) {
       return res.status(400).json({ message: "You have already reviewed this vehicle" });
     }
 
     const review = await Review.create({
       user: req.user._id,
-      car,
+      car: resolvedCarId,
       rating: Number(rating),
       title: title || "",
       comment: comment.trim(),

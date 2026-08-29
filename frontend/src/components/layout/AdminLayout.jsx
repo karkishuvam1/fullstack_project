@@ -1,24 +1,16 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import React from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "../../styles/theme.css";
 
-/**
- * AdminLayout
- * Sidebar + topbar shell used by every /admin page.
- *
- * Usage:
- *   <AdminLayout title="Dashboard" subtitle="Overview of your inventory">
- *     ...page content...
- *   </AdminLayout>
- */
 export default function AdminLayout({ title, subtitle, children }) {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
-  // TODO: replace with real logged-in admin data from AuthContext
-  const admin = { name: "Admin User" };
+  const adminName = user?.name || "Administrator";
 
   function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    logout();
     navigate("/login");
   }
 
@@ -26,26 +18,48 @@ export default function AdminLayout({ title, subtitle, children }) {
     <div className="ap-shell">
       <aside className="ap-sidebar">
         <div className="ap-sidebar-brand">
-          Aurel<em>i</em>a
+          <Link to="/home" style={{ color: "inherit", textDecoration: "none" }}>
+            Aurel<em>i</em>a
+          </Link>
         </div>
         <div className="ap-sidebar-sub">Admin Console</div>
 
         <nav className="ap-nav">
-          <NavLink to="/admin" end className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/admin"
+            end
+            className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}
+          >
             Dashboard
           </NavLink>
-          <NavLink to="/admin/cars" className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/admin/cars"
+            className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}
+          >
             Manage Cars
           </NavLink>
-          <NavLink to="/admin/orders" className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/admin/orders"
+            className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}
+          >
             Manage Orders
           </NavLink>
-          <NavLink to="/admin/users" className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/admin/users"
+            className={({ isActive }) => `ap-nav-link ${isActive ? "active" : ""}`}
+          >
             Manage Users
           </NavLink>
         </nav>
 
         <div className="ap-sidebar-footer">
+          <Link
+            to="/home"
+            className="ap-nav-link"
+            style={{ marginBottom: "0.75rem", textAlign: "center", display: "block" }}
+          >
+            ← Back to Store
+          </Link>
           <button className="ap-logout-btn" onClick={handleLogout}>
             Log Out
           </button>
@@ -60,8 +74,8 @@ export default function AdminLayout({ title, subtitle, children }) {
           </div>
 
           <div className="ap-user-chip">
-            <span className="ap-user-chip-name">{admin.name}</span>
-            <div className="ap-avatar">{getInitials(admin.name)}</div>
+            <span className="ap-user-chip-name">{adminName}</span>
+            <div className="ap-avatar">{getInitials(adminName)}</div>
           </div>
         </div>
 

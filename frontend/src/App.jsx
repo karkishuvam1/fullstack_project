@@ -1,83 +1,111 @@
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// Public Pages
+import Home from "./pages/Home";
+import Cars from "./pages/Cars";
+import CarDetail from "./pages/CarDetail";
+import Compare from "./pages/Compare";
+import About from "./pages/About";
+import BookTestDrive from "./pages/BookTestDrive";
+import Configurator from "./pages/Configurator";
+import Dealers from "./pages/Dealers";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Home from "./pages/Home";
+
+// Client Protected Pages
+import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
-import Dashboard from "./pages/admin/Dashboard";
+
+// Admin Protected Pages
+import AdminDashboard from "./pages/admin/Dashboard";
 import ManageCars from "./pages/admin/Managecars";
 import ManageOrders from "./pages/admin/Manageorders";
 import ManageUsers from "./pages/admin/Manageusers";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
+
 import "./App.css";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Root shows the login page. Once logged in, users land on /home. */}
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Storefront Routes */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/cars" element={<Cars />} />
+          <Route path="/cars/:slug" element={<CarDetail />} />
+          <Route path="/compare" element={<Compare />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/book-test-drive" element={<BookTestDrive />} />
+          <Route path="/book-test-drive/:slug" element={<BookTestDrive />} />
+          <Route path="/configurator" element={<Configurator />} />
+          <Route path="/configurator/:slug" element={<Configurator />} />
+          <Route path="/dealers" element={<Dealers />} />
 
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
+          {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+          {/* Client Authenticated Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Admin routes — same login check as the rest for now.
-            TODO: once User has a real "role" check available on the
-            frontend, tighten ProtectedRoute (or add an AdminRoute) so
-            only role === "admin" can reach these, not just any logged-in user. */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/cars"
-          element={
-            <ProtectedRoute>
-              <ManageCars />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/orders"
-          element={
-            <ProtectedRoute>
-              <ManageOrders />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            <ProtectedRoute>
-              <ManageUsers />
-            </ProtectedRoute>
-          }
-        />
+          {/* Admin Protected Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/cars"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <ManageCars />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <ManageOrders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <ManageUsers />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Anything unknown falls back to the login page */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Catch-all Fallback Route */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

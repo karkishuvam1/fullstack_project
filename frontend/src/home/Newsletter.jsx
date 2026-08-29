@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { subscribeNewsletter } from '../services/NewsletterService';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | loading | success
+  const [status, setStatus] = useState('idle');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email.trim()) {
@@ -22,12 +23,15 @@ const Newsletter = () => {
     setError('');
     setStatus('loading');
 
-    // Simulated request — swap for a real POST to /api/newsletter once the
-    // backend endpoint exists.
-    setTimeout(() => {
+    try {
+      await subscribeNewsletter(email);
       setStatus('success');
       setEmail('');
-    }, 900);
+    } catch (err) {
+      const message = err.response?.data?.message || 'Subscription failed. Please try again.';
+      setError(message);
+      setStatus('idle');
+    }
   };
 
   if (status === 'success') {
