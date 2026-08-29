@@ -2,6 +2,8 @@ const express = require("express");
 const {
   getCars,
   getCarBySlug,
+  getCarById,
+  getFeaturedCars,
   createCar,
   updateCar,
   deleteCar,
@@ -11,6 +13,8 @@ const { protect, admin } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.get("/", getCars);
+router.get("/featured", getFeaturedCars);
+router.get("/id/:id", getCarById);
 router.get("/:slug", getCarBySlug);
 
 router.post("/", protect, admin, createCar);

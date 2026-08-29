@@ -10,29 +10,30 @@ async function protect(req, res, next) {
   ) {
     try {
       token = req.headers.authorization.split(" ")[1];
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret_key");
       req.user = await User.findById(decoded.id).select("-password");
 
-      next();
+      if (!req.user) {
+        return res.status(401).json({ message: "User not found with this token" });
+      }
+
+      return next();
     } catch (error) {
-      console.error(error);
-      res.status(401).json({ message: "Not authorized, token failed" });
+      console.error("AUTH TOKEN VERIFY ERROR:", error.message);
+      return res.status(401).json({ message: "Not authorized, token failed" });
     }
   }
 
   if (!token) {
-    res.status(401).json({ message: "Not authorized, no token" });
+    return res.status(401).json({ message: "Not authorized, no token provided" });
   }
 }
 
 async function admin(req, res, next) {
   if (req.user && req.user.role === "admin") {
-    next();
-  } else {
-    res.status(401).json({ message: "Not authorized as an admin" });
+    return next();
   }
+  return res.status(403).json({ message: "Not authorized as an admin" });
 }
 
 module.exports = { protect, admin };
