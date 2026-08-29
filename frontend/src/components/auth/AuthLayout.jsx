@@ -1,5 +1,7 @@
-import "../../styles/auth.css";
-export default function AuthLayout({ children }) {
+import React from 'react';
+import '../../styles/auth.css';
+
+export function AuthLayout({ children }) {
   return (
     <div className="aur-root">
       <div className="aur-showroom">
@@ -7,17 +9,17 @@ export default function AuthLayout({ children }) {
 
         <div className="aur-brandmark">
           <div className="aur-mark">
-            Aurel<em>i</em>a Motorworks
+            <span>⚡</span> Automobili <em>Lamborghini</em>
           </div>
-          <div className="aur-tag">Exceptional automobiles, privately sourced</div>
+          <div className="aur-tag">Sant'Agata Bolognese · Italy</div>
         </div>
 
         <CarIllustration />
 
         <div className="aur-showroom-footer">
-          <strong>Curated inventory.</strong> Verified provenance.
+          <strong>Official Client Portal.</strong> Verified allocations & test drives.
           <br />
-          Members receive first viewing on new arrivals.
+          Registered clients receive priority allocation on limited edition reveals.
         </div>
       </div>
 
@@ -28,8 +30,6 @@ export default function AuthLayout({ children }) {
   );
 }
 
-// Simple line-art car that draws itself in with a CSS animation
-// (see .aur-blueprint-path in auth.css)
 function CarIllustration() {
   return (
     <svg
@@ -38,7 +38,7 @@ function CarIllustration() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="Line illustration of a coupe"
+      aria-label="Lamborghini sports coupe line silhouette"
     >
       <path
         className="aur-blueprint-path"
@@ -58,3 +58,5 @@ function CarIllustration() {
     </svg>
   );
 }
+
+export default AuthLayout;

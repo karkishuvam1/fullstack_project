@@ -1,10 +1,15 @@
-function notFound(req, res, next){
-    return res.status(404).json({message: `Route not found ${req.originalUrl}`})
+function notFound(req, res, next) {
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  res.status(404);
+  next(error);
 }
 
 function errorHandler(err, req, res, next) {
-    console.error(err.stack);
-    res.status(res.statusCode === 200 ? 500 : res.statusCode).json({message: err.message || "server error"});
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    message: err.message || "An unexpected server error occurred.",
+    stack: process.env.NODE_ENV === "production" ? null : err.stack,
+  });
 }
 
-module.exports = {notFound, errorHandler};
+module.exports = { notFound, errorHandler };

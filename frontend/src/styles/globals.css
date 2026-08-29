@@ -1,0 +1,159 @@
+@import "./variables.css";
+@import "./Home.css";
+@import "./auth.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg, #080808);
+  color: var(--color-text, #f0f0f0);
+  font-family: var(--font-base, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(229, 184, 0, 0.35);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #040404;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lambo-gold, #e5b800);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+  font-weight: 800;
+  color: #fff;
+}
+
+.lambo-home-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg, #080808);
+}
+
+/* Angular Lamborghini Cut Utility */
+.lambo-cut {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.lambo-cut-lg {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+}
+
+/* Button Classes */
+.lambo-btn-gold {
+  background: var(--lambo-gold, #e5b800);
+  color: #0f0d09;
+  border: 1px solid var(--lambo-gold, #e5b800);
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.lambo-btn-gold:hover:not(:disabled) {
+  background: #f5c81a;
+  box-shadow: 0 0 20px rgba(229, 184, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.lambo-btn-gold:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lambo-btn-outline {
+  background: transparent;
+  color: #fff;
+  border: 1px solid var(--lambo-border, #222);
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.lambo-btn-outline:hover:not(:disabled) {
+  border-color: var(--lambo-gold, #e5b800);
+  color: var(--lambo-gold, #e5b800);
+  background: rgba(229, 184, 0, 0.08);
+}
+
+.lambo-btn-outline:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.aur-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--lambo-gold, #e5b800);
+  border-radius: 50%;
+  animation: aur-spin 0.7s linear infinite;
+  display: inline-block;
+}

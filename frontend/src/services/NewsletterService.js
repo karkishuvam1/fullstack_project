@@ -1,11 +1,11 @@
-import api from "./Api";
+import api from "./api";
 
 export async function subscribeNewsletter(email) {
-  const response = await api.post("/newsletter/subscribe", { email });
-  return response.data;
+  const { data } = await api.post("/newsletter/subscribe", { email });
+  return data;
 }
 
-export async function getSubscribers() {
-  const response = await api.get("/newsletter/subscribers");
-  return response.data;
+export async function getAllSubscribers() {
+  const { data } = await api.get("/newsletter/all");
+  return data;
 }

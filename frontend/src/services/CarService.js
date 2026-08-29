@@ -1,27 +1,41 @@
-import api from "./Api";
+import api from "./api";
 
-export async function getCars(category) {
-  const params = category ? { params: { category } } : {};
-  const response = await api.get("/cars", params);
-  return response.data;
+export async function getCars(params = {}) {
+  const { data } = await api.get("/cars", { params });
+  return data;
+}
+
+export async function getFeaturedCars() {
+  const { data } = await api.get("/cars/featured");
+  return data;
 }
 
 export async function getCarBySlug(slug) {
-  const response = await api.get(`/cars/${slug}`);
-  return response.data;
+  const { data } = await api.get(`/cars/${slug}`);
+  return data;
 }
 
 export async function createCar(carData) {
-  const response = await api.post("/cars", carData);
-  return response.data;
+  const { data } = await api.post("/cars", carData);
+  return data;
 }
 
 export async function updateCar(id, carData) {
-  const response = await api.put(`/cars/${id}`, carData);
-  return response.data;
+  const { data } = await api.put(`/cars/${id}`, carData);
+  return data;
 }
 
 export async function deleteCar(id) {
-  const response = await api.delete(`/cars/${id}`);
-  return response.data;
+  const { data } = await api.delete(`/cars/${id}`);
+  return data;
+}
+
+export async function addCarReview(carId, reviewData) {
+  const { data } = await api.post(`/cars/${carId}/reviews`, reviewData);
+  return data;
+}
+
+export async function getCarReviews(carId) {
+  const { data } = await api.get(`/cars/${carId}/reviews`);
+  return data;
 }

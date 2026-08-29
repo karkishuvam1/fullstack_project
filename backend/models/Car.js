@@ -12,11 +12,13 @@ const carSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
+      trim: true,
     },
     category: {
       type: String,
-      enum: ["Super Sports", "Super SUV", "Limited Edition"],
+      enum: ["Super Sports", "Super SUV", "Limited Edition", "Concept"],
       required: true,
+      default: "Super Sports",
     },
     power: {
       type: String,
@@ -34,13 +36,17 @@ const carSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    zeroToSixty: {
+      type: String,
+      default: "",
+    },
     weight: {
       type: String,
       required: true,
     },
     transmission: {
       type: String,
-      default: "Automatic",
+      default: "8-speed Dual-clutch",
     },
     drivetrain: {
       type: String,
@@ -76,9 +82,22 @@ const carSchema = new mongoose.Schema(
       {
         name: String,
         hex: String,
+        price: { type: Number, default: 0 },
       },
     ],
+    rating: {
+      type: Number,
+      default: 5.0,
+    },
+    numReviews: {
+      type: Number,
+      default: 0,
+    },
     isActive: {
+      type: Boolean,
+      default: true,
+    },
+    isFeatured: {
       type: Boolean,
       default: true,
     },
