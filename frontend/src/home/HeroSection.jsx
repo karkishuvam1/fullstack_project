@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useOnScreen from '../common/useonScreen';
 
 // Real, freely-licensed (Unsplash License) photo of a matte black Aventador —

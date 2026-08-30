@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { getAllUsers, updateUserRole, deleteUser } from "../../services/AdminService";
 import "../../styles/theme.css";

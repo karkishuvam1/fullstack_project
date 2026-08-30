@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { getCars, createCar, updateCar, deleteCar } from "../../services/CarService";
 import { getImageUrl, handleImageError } from "../../utils/imageUrl";
